@@ -10,7 +10,7 @@ assignees: ''
 # Feature name
 
 > [!NOTE]
-> (Put a short description of the feature here. Remove this note block if you don't have a description to put)
+> > Please provide at least short description of the feature here
 
 ## Do the following:
 - [ ] List here all of the things that this feature requires
