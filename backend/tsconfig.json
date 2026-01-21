@@ -1,0 +1,32 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // Modules & Targets
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+
+    // Strictness and Safety
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedSideEffectImports": true,
+
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./build",
+    "sourceMap": true,
+
+    // Output and Performance
+    "skipLibCheck": true,
+    "moduleDetection": "force",
+    "forceConsistentCasingInFileNames": true,
+
+    // Other Outputs
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
