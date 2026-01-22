@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --font-poppins: Poppins, sans-serif;
+
+  --color-background: #e3e3e3;
+  --color-surface: #f4f4f4;
+  --color-primary: #4988c4;
+  --color-primary-variant: #1c4d8d;
+  --color-error: #dc143c;
+}
+
+@layer base {
+  html,
+  body {
+    @apply transition-colors duration-150;
+  }
+
+  body {
+    @apply bg-no-repeat bg-background text-xl text-slate-600 font-poppins m-0;
+  }
+
+  ::selection {
+    @apply bg-primary text-white;
+  }
+
+  h1 {
+    @apply text-7xl;
+  }
+
+  h2 {
+    @apply text-6xl;
+  }
+
+  h3 {
+    @apply text-5xl;
+  }
+
+  h4 {
+    @apply text-4xl;
+  }
+
+  h5 {
+    @apply text-3xl;
+  }
+
+  h6 {
+    @apply text-2xl;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-slate-700;
+  }
+
+  input,
+  textarea {
+    @apply bg-white rounded-lg px-3 py-2 border-2 border-transparent outline-primary caret-primary;
+  }
+}
+
+@utility fixed-center {
+  @apply -translate-x-[50%] left-[50%];
+}
