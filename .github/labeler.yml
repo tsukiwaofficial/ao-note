@@ -18,6 +18,11 @@ ui/ux:
     - public/**
     - frontend/**
 
+server:
+- changed-files:
+  - any-glob-to-any-file:
+    - backend/**
+
 devops:
 - head-branch: release/*
 - changed-files:
@@ -34,4 +39,5 @@ documentation:
 dependencies:
 - head-branch: deps/*
 - changed-files:
+
   - any-glob-to-any-file: 'pnpm-lock.yaml'
