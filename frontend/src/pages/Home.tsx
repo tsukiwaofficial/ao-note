@@ -24,17 +24,16 @@ export default function Home() {
     <div className="container mx-auto py-50 flex justify-between">
       <div className="inline-grid grid-cols-1 gap-y-4 w-full mr-50 h-max">
         {notes.length > 0 ? (
-          notes.map(
-            ({ _id, title, content, createdAt }: Note, index: number) => (
-              <NoteDetails
-                key={index}
-                _id={_id}
-                title={title}
-                content={content}
-                createdAt={createdAt}
-              />
-            ),
-          )
+          notes.map(({ _id, title, content, createdAt, updatedAt }: Note) => (
+            <NoteDetails
+              key={_id}
+              _id={_id}
+              title={title}
+              content={content}
+              createdAt={createdAt}
+              updatedAt={updatedAt}
+            />
+          ))
         ) : (
           <div className="">No notes found</div>
         )}
