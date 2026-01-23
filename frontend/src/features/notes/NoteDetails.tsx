@@ -23,32 +23,34 @@ export default function NoteDetails({ _id, title, content, createdAt }: Note) {
   };
 
   return (
-    <div className="p-8 shadow bg-surface rounded-lg flex items-start justify-between gap-8 hover:-translate-y-1 hover:shadow-lg transition-transform">
-      <div className="space-y-4">
-        <div className="">
-          <h5 className="line-clamp-1 capitalize text-primary">{title}</h5>
-          <p className="line-clamp-2">{content}</p>
+    <div className="p-8 shadow bg-surface max-h-max rounded-lg hover:-translate-y-1 hover:shadow-lg transition-transform">
+      <div className="w-full flex items-start justify-between gap-10">
+        <div className="space-y-4">
+          <div className="">
+            <h5 className="line-clamp-1 capitalize text-primary">{title}</h5>
+            <p className="line-clamp-2">{content}</p>
+          </div>
         </div>
-        {createdAt && (
-          <span className="text-sm text-slate-400">
-            {formatDistanceToNow(new Date(createdAt), {
-              addSuffix: true,
-              includeSeconds: true,
-            })}
-          </span>
-        )}
+        <div className="flex flex-col items-center justify-between">
+          <button
+            onClick={deleteNote}
+            className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
+          >
+            <FaTrash />
+          </button>
+          <button className="rounded-full p-4 hover:bg-primary cursor-pointer hover:text-white transition-colors">
+            <FaPencil />
+          </button>
+        </div>
       </div>
-      <div className="flex flex-col items-center justify-between">
-        <button
-          onClick={deleteNote}
-          className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
-        >
-          <FaTrash />
-        </button>
-        <button className="rounded-full p-4 hover:bg-primary cursor-pointer hover:text-white transition-colors">
-          <FaPencil />
-        </button>
-      </div>
+      {createdAt && (
+        <span className="text-sm text-slate-400">
+          {formatDistanceToNow(new Date(createdAt), {
+            addSuffix: true,
+            includeSeconds: true,
+          })}
+        </span>
+      )}
     </div>
   );
 }
