@@ -24,9 +24,7 @@ export default function NoteProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [state, dispatch] = useReducer(noteReducer, [
-    { title: "", content: "" },
-  ]);
+  const [state, dispatch] = useReducer(noteReducer, []);
 
   return (
     <NoteContext.Provider value={{ state, dispatch }}>
