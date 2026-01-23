@@ -8,6 +8,7 @@ import NoteProvider from "./features/notes/NoteProvider";
 
 // components
 import Header from "./layouts/Header";
+import Footer from "./layouts/Footer";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
         </Routes>
       </NoteProvider>
+      <Footer />
     </BrowserRouter>
   );
 };
