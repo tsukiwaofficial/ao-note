@@ -22,9 +22,9 @@ export default function Home() {
 
   return (
     <div className="container mx-auto py-50 flex justify-between gap-30">
-      <div className="space-y-5">
+      <div className="space-y-5 w-full">
         <h3>Notes</h3>
-        <div className="inline-grid grid-cols-1 gap-y-4 h-max">
+        <div className="h-max grid grid-cols-1 gap-y-4">
           {notes.length > 0 ? (
             notes.map(({ _id, title, content, createdAt, updatedAt }: Note) => (
               <NoteDetails
