@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Note } from "./note.types";
 import { postOptions } from "../../shared/utils/http/post.options";
 import { useNoteContext } from "./useNoteContext";
-import { timer } from "../../shared/utils/timer";
+import { timer } from "../../shared/utils/timer.util";
 
 export default function NoteForm() {
   const [noteData, setNoteData] = useState<Note>({

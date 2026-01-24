@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import type { Note } from "./note.types";
 import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
 import { useNoteContext } from "./useNoteContext";
-import { timer } from "../../shared/utils/timer";
+import { timer } from "../../shared/utils/timer.util";
 
 export default function NoteDetails({
   _id,
