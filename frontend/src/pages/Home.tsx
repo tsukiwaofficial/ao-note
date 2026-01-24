@@ -21,22 +21,25 @@ export default function Home() {
   }, [dispatch]);
 
   return (
-    <div className="container mx-auto py-50 flex justify-between">
-      <div className="inline-grid grid-cols-1 gap-y-4 w-full mr-50 h-max">
-        {notes.length > 0 ? (
-          notes.map(({ _id, title, content, createdAt, updatedAt }: Note) => (
-            <NoteDetails
-              key={_id}
-              _id={_id}
-              title={title}
-              content={content}
-              createdAt={createdAt}
-              updatedAt={updatedAt}
-            />
-          ))
-        ) : (
-          <div className="">No notes found</div>
-        )}
+    <div className="container mx-auto py-50 flex justify-between gap-30">
+      <div className="space-y-5">
+        <h3>Notes</h3>
+        <div className="inline-grid grid-cols-1 gap-y-4 h-max">
+          {notes.length > 0 ? (
+            notes.map(({ _id, title, content, createdAt, updatedAt }: Note) => (
+              <NoteDetails
+                key={_id}
+                _id={_id}
+                title={title}
+                content={content}
+                createdAt={createdAt}
+                updatedAt={updatedAt}
+              />
+            ))
+          ) : (
+            <div className="">No notes found</div>
+          )}
+        </div>
       </div>
       <NoteForm />
     </div>
