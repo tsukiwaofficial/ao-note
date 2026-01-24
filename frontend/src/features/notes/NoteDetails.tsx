@@ -3,6 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import type { Note } from "./note.types";
 import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
 import { useNoteContext } from "./useNoteContext";
+import { timer } from "../../shared/utils/timer";
 
 export default function NoteDetails({
   _id,
@@ -18,6 +19,7 @@ export default function NoteDetails({
     content,
   });
   const [error, setError] = useState<string>("");
+  const [emptyFields, setEmptyFields] = useState<string[]>([]);
 
   const deleteNote = async () => {
     const response = await fetch(
@@ -36,7 +38,7 @@ export default function NoteDetails({
   };
 
   const updateNote = async () => {
-    setIsUpdating(!isUpdating);
+    setIsUpdating(true);
 
     if (isUpdating) {
       const response = await fetch(
@@ -50,12 +52,32 @@ export default function NoteDetails({
 
       const result = await response.json();
 
-      if (!response.ok) setError(result.message);
+      if (!response.ok) {
+        setError(result.message);
+        if (result.emptyFields) {
+          switch (true) {
+            case result.emptyFields.includes("title"):
+              setEmptyFields(result.emptyFields);
+              break;
+            case result.emptyFields.includes("content"):
+              setEmptyFields(result.emptyFields);
+              break;
+          }
+        }
+
+        await timer(3);
+        setError("");
+
+        return;
+      }
 
       dispatch({
         type: "UPDATE_NOTE",
         payload: { _id, ...noteData, createdAt, updatedAt },
       });
+
+      setEmptyFields([]);
+      setIsUpdating(false);
     }
   };
 
@@ -67,30 +89,30 @@ export default function NoteDetails({
   };
 
   return (
-    <div className="p-8 shadow bg-surface max-h-max rounded-lg hover:-translate-y-1 hover:shadow-lg transition-transform">
-      <div className="w-full flex items-start justify-between gap-10">
-        <div className="space-y-4">
-          <div className="flex flex-col w-full">
+    <div
+      className={`p-8 shadow bg-surface rounded-lg hover:-translate-y-1 hover:shadow-lg h-full max-h-max hover:max-h-125 transition-[shadow_max-height] ${error && "animate-shake"}`}
+    >
+      <div className="flex items-start justify-between gap-10">
+        <div className="space-y-4 w-full">
+          <div className="flex flex-col">
             {isUpdating ? (
               <input
                 type="text"
                 name="title"
                 id="update-title"
-                className="mb-2"
+                className={`${emptyFields.includes("title") && "border-error"} mb-2`}
                 placeholder="Title"
                 value={noteData.title}
                 onChange={handleUpdateChange}
               />
             ) : (
-              <h5 className="line-clamp-1 capitalize text-primary mb-1">
-                {title}
-              </h5>
+              <h5 className="text-primary mb-1 line-clamp-1">{title}</h5>
             )}
             {isUpdating ? (
               <textarea
                 name="content"
                 id="update-content"
-                className=""
+                className={`${emptyFields.includes("content") && "border-error"} min-h-40`}
                 placeholder="Content"
                 value={noteData.content}
                 onChange={handleUpdateChange}
@@ -99,11 +121,11 @@ export default function NoteDetails({
               <p className="line-clamp-2">{content}</p>
             )}
           </div>
-          {error && (
-            <div className="rounded-lg text-error p-4 border-2 border-error bg-error/30 w-max">
-              {error}
-            </div>
-          )}
+          <div
+            className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} transition-[opacity_height]`}
+          >
+            {error}
+          </div>
         </div>
         <div className="flex flex-col items-center justify-between">
           <button
@@ -120,7 +142,12 @@ export default function NoteDetails({
           </button>
           {isUpdating && (
             <button
-              onClick={() => setIsUpdating(false)}
+              onClick={() => {
+                setIsUpdating(false);
+                setEmptyFields([]);
+                setError("");
+                setNoteData({ title, content });
+              }}
               className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
             >
               <FaXmark />
