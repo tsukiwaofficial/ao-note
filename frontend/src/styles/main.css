@@ -8,6 +8,8 @@
   --color-primary: #4988c4;
   --color-primary-variant: #1c4d8d;
   --color-error: #dc143c;
+
+  --animate-shake: shake 0.5s ease-in-out;
 }
 
 @layer base {
@@ -59,10 +61,32 @@
 
   input,
   textarea {
-    @apply bg-white rounded-lg px-3 py-2 border-2 border-transparent outline-primary caret-primary;
+    @apply bg-white rounded-lg border-2 border-transparent outline-primary caret-primary;
   }
 }
 
 @utility fixed-center {
   @apply -translate-x-[50%] left-[50%];
+}
+
+@utility note-form {
+  @apply px-3 py-2;
+}
+
+/* keyframes */
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25%,
+  75% {
+    transform: translateX(-5px);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
 }
