@@ -6,6 +6,8 @@ const noteReducer = (prevState: Note[], action: NoteAction): Note[] => {
   switch (action.type) {
     case "GET_NOTES":
       return [...action.payload];
+    case "GET_NOTE":
+      return [action.payload];
     case "ADD_NOTE":
       return [action.payload, ...prevState];
     case "DELETE_NOTE":

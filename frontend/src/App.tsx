@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // pages
 import Home from "./pages/Home";
+import Note from "./features/notes/[Note]";
 
 // providers
 import NoteProvider from "./features/notes/NoteProvider";
@@ -17,6 +18,7 @@ const App = () => {
       <NoteProvider>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/:id" element={<Note />} />
         </Routes>
       </NoteProvider>
       <Footer />
