@@ -61,12 +61,16 @@
 
   input,
   textarea {
-    @apply bg-white rounded-lg px-3 py-2 border-2 border-transparent outline-primary caret-primary;
+    @apply bg-white rounded-lg border-2 border-transparent outline-primary caret-primary;
   }
 }
 
 @utility fixed-center {
   @apply -translate-x-[50%] left-[50%];
+}
+
+@utility note-form {
+  @apply px-3 py-2;
 }
 
 /* keyframes */

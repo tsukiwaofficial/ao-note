@@ -3,6 +3,11 @@ import type { Note } from "./note.types";
 import { postOptions } from "../../shared/utils/http/post.options";
 import { useNoteContext } from "./useNoteContext";
 import { timer } from "../../shared/utils/timer.util";
+import { notePlaceholders } from "../placeholders/placeholders.config";
+import { getPlaceholder } from "../placeholders/get-placeholder.util";
+
+const { title: titlePlaceholder, content: contentPlaceholder } =
+  getPlaceholder(notePlaceholders);
 
 export default function NoteForm() {
   const [noteData, setNoteData] = useState<Note>({
@@ -20,12 +25,17 @@ export default function NoteForm() {
     setNoteData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const payload = {
+      title: noteData.title.trim(),
+      content: noteData.content.trim(),
+    };
 
     const response = await fetch(
       import.meta.env.VITE_BACKEND_URL + "/notes",
-      postOptions<Note>(noteData),
+      postOptions<Note>(payload),
     );
 
     const result = await response.json();
@@ -60,17 +70,17 @@ export default function NoteForm() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="relative space-y-5">
       <h3 className="">Add a note</h3>
+      <img
+        src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaDV0ZGtxbms5bXg1aGY2OXNwM3NrdG4zMmU5djZrMjhsemUxOG92eCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/boOoHL2PAFXahZyObR/giphy.gif"
+        alt=""
+        className="absolute max-w-70 -top-45 -right-20"
+      />
       <form
-        className={`relative space-y-8 w-125 bg-surface shadow-lg rounded-lg p-10 hover:shadow-xl hover:-translate-y-1 transition-[shadow_transform] ${error && "animate-shake"}`}
+        className={`space-y-8 w-125 bg-surface shadow-lg rounded-lg p-10 overflow-hidden hover:shadow-2xl hover:-translate-y-2 hover:z-10 transition-[shadow_transform] ${error && "animate-shake"}`}
         onSubmit={handleSubmit}
       >
-        <img
-          src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaDV0ZGtxbms5bXg1aGY2OXNwM3NrdG4zMmU5djZrMjhsemUxOG92eCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/boOoHL2PAFXahZyObR/giphy.gif"
-          alt=""
-          className="absolute max-w-70 -top-60 -right-25"
-        />
         <div className="space-y-4">
           <div className="flex flex-col">
             <label htmlFor="title" className="mb-2 text-primary font-semibold">
@@ -80,8 +90,8 @@ export default function NoteForm() {
               type="text"
               name="title"
               id="title"
-              className={`${emptyFields.includes("title") ? "border-error" : ""}`}
-              placeholder="Title"
+              className={`${emptyFields.includes("title") ? "border-error focus:outline-none" : ""} note-form`}
+              placeholder={titlePlaceholder}
               value={noteData.title}
               onChange={handleInputChange}
             />
@@ -96,8 +106,8 @@ export default function NoteForm() {
             <textarea
               name="content"
               id="content"
-              className={`${emptyFields.includes("content") ? "border-error" : ""} min-h-50`}
-              placeholder="Content"
+              className={`${emptyFields.includes("content") ? "border-error focus:outline-none" : ""} min-h-50 note-form`}
+              placeholder={contentPlaceholder}
               value={noteData.content}
               onChange={handleInputChange}
             />
@@ -110,7 +120,7 @@ export default function NoteForm() {
           Create Note
         </button>
         <div
-          className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 h-max" : "h-0"} transition-[opacity_height]`}
+          className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 h-max" : "h-0"} w-max transition-[opacity_height]`}
         >
           {error}
         </div>
