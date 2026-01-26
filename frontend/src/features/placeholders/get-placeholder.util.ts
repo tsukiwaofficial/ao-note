@@ -1,4 +1,4 @@
-import type { NotePlaceholder } from "../types/placeholder.type";
+import type { NotePlaceholder } from "./placeholder.type";
 
 export const getPlaceholder = (array: NotePlaceholder[]) => {
   const random = Math.floor(Math.random() * array.length);
