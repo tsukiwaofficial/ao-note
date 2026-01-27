@@ -63,6 +63,11 @@
   textarea {
     @apply bg-white rounded-lg border-2 border-transparent outline-primary caret-primary;
   }
+
+  button,
+  a {
+    @apply outline-primary-variant;
+  }
 }
 
 @utility fixed-center {
