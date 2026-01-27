@@ -3,7 +3,7 @@ export default function Footer() {
 
   return (
     <footer className="pb-20 text-center text-sm text-slate-500">
-      <p>Copyright {date} tsukiwa. All rights reserved.</p>
+      <p>Copyright {date} © tsukiwa. All rights reserved.</p>
     </footer>
   );
 }
