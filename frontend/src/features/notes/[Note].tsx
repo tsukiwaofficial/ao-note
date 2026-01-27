@@ -1,29 +1,22 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Note } from "./note.types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNoteContext } from "./useNoteContext";
 import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
 import { timer } from "../../shared/utils/timer.util";
 import { deleteNote } from "./delete-note.util";
 import { formatDistanceToNow } from "date-fns";
+import Section from "../../layouts/Section";
+import { handleKeyDown } from "./note-keydown.util";
 
 export default function Note() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { state: note, dispatch } = useNoteContext();
   const [noteData, setNoteData] = useState<Note>({} as Note);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
-
-  const handleGoBack = () => {
-    if (location.key === "default") {
-      navigate("/", { replace: true });
-    } else {
-      navigate(-1);
-    }
-  };
 
   const handleUpdateChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -32,8 +25,8 @@ export default function Note() {
     setNoteData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const updateNote = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const updateNote = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     setIsUpdating(true);
 
     if (isUpdating) {
@@ -116,9 +109,9 @@ export default function Note() {
   }, [dispatch, id]);
 
   return (
-    <div className="container mx-auto p-50 flex flex-col">
+    <Section className="p-50">
       <form
-        className="w-full flex items-start justify-between gap-10 overflow-hidden"
+        className="w-full flex items-start justify-between gap-10"
         onSubmit={updateNote}
       >
         <div className=" w-full">
@@ -134,7 +127,7 @@ export default function Note() {
                 placeholder="Title"
                 value={noteData.title}
                 onChange={handleUpdateChange}
-                // autoFocus
+                onKeyDown={(event) => handleKeyDown(event, updateNote)}
               />
             ) : (
               <h5 className="whitespace-normal pl-2 text-primary">
@@ -172,6 +165,7 @@ export default function Note() {
                 placeholder="Content"
                 value={noteData.content}
                 onChange={handleUpdateChange}
+                onKeyDown={(event) => handleKeyDown(event, updateNote)}
               />
             ) : (
               <div className="whitespace-pre-line pl-2">{noteData.content}</div>
@@ -210,14 +204,14 @@ export default function Note() {
               </button>
             )}
           </div>
-          <button
-            onClick={handleGoBack}
+          <Link
+            to="/"
             className="p-4 ml-auto rounded-lg cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant transition-colors"
           >
             Back
-          </button>
+          </Link>
         </div>
       </form>
-    </div>
+    </Section>
   );
 }

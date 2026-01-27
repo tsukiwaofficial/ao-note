@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { Note } from "./note.types";
 import { postOptions } from "../../shared/utils/http/post.options";
 import { useNoteContext } from "./useNoteContext";
 import { timer } from "../../shared/utils/timer.util";
 import { notePlaceholders } from "../placeholders/placeholders.config";
 import { getPlaceholder } from "../placeholders/get-placeholder.util";
+import { handleKeyDown } from "./note-keydown.util";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -25,8 +26,8 @@ export default function NoteForm() {
     setNoteData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
 
     const payload = {
       title: noteData.title.trim(),
@@ -71,7 +72,7 @@ export default function NoteForm() {
 
   return (
     <div className="relative space-y-5">
-      <h3 className="">Add a note</h3>
+      <h3 className="">Add Note</h3>
       <img
         src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaDV0ZGtxbms5bXg1aGY2OXNwM3NrdG4zMmU5djZrMjhsemUxOG92eCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/boOoHL2PAFXahZyObR/giphy.gif"
         alt=""
@@ -94,6 +95,7 @@ export default function NoteForm() {
               placeholder={titlePlaceholder}
               value={noteData.title}
               onChange={handleInputChange}
+              onKeyDown={(event) => handleKeyDown(event, handleSubmit)}
             />
           </div>
           <div className="flex flex-col">
@@ -106,10 +108,11 @@ export default function NoteForm() {
             <textarea
               name="content"
               id="content"
-              className={`${emptyFields.includes("content") ? "border-error focus:outline-none" : ""} min-h-50 note-form`}
+              className={`${emptyFields.includes("content") ? "border-error focus:outline-none" : ""} field-sizing-content resize-none min-h-50 note-form`}
               placeholder={contentPlaceholder}
               value={noteData.content}
               onChange={handleInputChange}
+              onKeyDown={(event) => handleKeyDown(event, handleSubmit)}
             />
           </div>
         </div>
