@@ -41,7 +41,7 @@ export default function NoteForm() {
     const result = await response.json();
 
     if (!response.ok) {
-      setError(result.error);
+      setError(result.message);
       if (result.emptyFields) {
         switch (true) {
           case result.emptyFields.includes("title"):
