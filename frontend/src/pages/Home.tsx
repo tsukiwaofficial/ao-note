@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import type { Note } from "../features/notes/note.types";
 import NoteDetails from "../features/notes/NoteDetails";
-import NoteForm from "../features/notes/NoteForm";
 import { useNoteContext } from "../features/notes/useNoteContext";
 import Banner from "../components/Banner";
+import Section from "../layouts/Section";
+import { FaPlus } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const { state: notes, dispatch } = useNoteContext();
@@ -22,11 +24,18 @@ export default function Home() {
   }, [dispatch]);
 
   return (
-    <div className="container mx-auto pt-50 pb-25 space-y-15">
-      <div className="flex justify-between gap-20">
-        <div className="space-y-5 w-full">
-          <h3>Notes</h3>
-          <div className="h-max grid grid-cols-1 gap-y-5">
+    <Section>
+      <h3 className="mb-5">Notes</h3>
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-10">
+        <div className="xl:col-span-3 space-y-5 w-full">
+          <Link
+            to="/add-note"
+            className="w-full h-max p-10 text-4xl font-bold font-primary flex items-center justify-center gap-5 shadow-lg bg-surface text-primary rounded-lg hover:-translate-y-2 hover:shadow-xl hover:bg-primary hover:text-white transition-[shadow_color]"
+          >
+            <FaPlus />
+            Add Note
+          </Link>
+          <div className="h-max grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
             {notes.length > 0 ? (
               notes.map(
                 ({ _id, title, content, createdAt, updatedAt }: Note) => (
@@ -45,11 +54,10 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div className="flex flex-col gap-10">
-          <NoteForm />
+        <div className="xl:col-span-2 w-full flex flex-col gap-10">
           <Banner />
         </div>
       </div>
-    </div>
+    </Section>
   );
 }

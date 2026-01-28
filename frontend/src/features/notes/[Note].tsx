@@ -5,9 +5,9 @@ import { useNoteContext } from "./useNoteContext";
 import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
 import { timer } from "../../shared/utils/timer.util";
 import { deleteNote } from "./delete-note.util";
-import { formatDistanceToNow } from "date-fns";
 import Section from "../../layouts/Section";
 import { handleKeyDown } from "./note-keydown.util";
+import NoteDate from "./NoteDate";
 
 export default function Note() {
   const { id } = useParams();
@@ -109,21 +109,21 @@ export default function Note() {
   }, [dispatch, id]);
 
   return (
-    <Section className="p-50">
+    <Section className="px-[5vw]">
       <form
-        className="w-full flex items-start justify-between gap-10"
+        className={`w-full flex flex-col xl:flex-row items-end xl:items-start justify-between gap-10 ${error && "animate-shake"}`}
         onSubmit={updateNote}
       >
-        <div className=" w-full">
+        <div className="w-full h-max">
           <div
             onClick={() => setIsUpdating(true)}
-            className="flex flex-col cursor-text"
+            className="w-full flex flex-col cursor-text"
           >
             {isUpdating ? (
               <textarea
                 name="title"
                 id="update-title"
-                className={`${emptyFields.includes("title") && "placeholder:text-error/50 animate-shake focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content resize-none text-3xl font-bold text-primary transition-colors`}
+                className={`${emptyFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content resize-none text-3xl font-bold text-primary transition-colors`}
                 placeholder="Title"
                 value={noteData.title}
                 onChange={handleUpdateChange}
@@ -134,34 +134,17 @@ export default function Note() {
                 {noteData.title}
               </h5>
             )}
-            <div className="mt-1 mb-10 ml-2">
-              {noteData.createdAt && (
-                <span className="text-sm text-slate-400">
-                  Created{" "}
-                  {formatDistanceToNow(new Date(noteData.createdAt), {
-                    addSuffix: true,
-                    includeSeconds: true,
-                  })}
-                </span>
-              )}
-              {noteData.updatedAt &&
-                noteData.createdAt !== noteData.updatedAt && (
-                  <span className="text-sm text-slate-400">
-                    {" "}
-                    (Updated{" "}
-                    {formatDistanceToNow(new Date(noteData.updatedAt), {
-                      addSuffix: true,
-                      includeSeconds: true,
-                    })}
-                    )
-                  </span>
-                )}
-            </div>
+            <NoteDate
+              className="mt-1 mb-10 ml-2"
+              createdAt={noteData.createdAt}
+              updatedAt={noteData.updatedAt}
+            />
+            <div className=""></div>
             {isUpdating ? (
               <textarea
                 name="content"
                 id="update-content"
-                className={`${emptyFields.includes("content") && "placeholder:text-error/50 animate-shake focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content min-h-15 resize-none`}
+                className={`${emptyFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content min-h-15 resize-none`}
                 placeholder="Content"
                 value={noteData.content}
                 onChange={handleUpdateChange}
@@ -177,8 +160,8 @@ export default function Note() {
             {error}
           </div>
         </div>
-        <div className="flex items-start justify-between gap-5">
-          <div className="flex flex-col">
+        <div className="flex flex-col xl:flex-row items-start justify-between gap-5">
+          <div className="flex xl:flex-col">
             <button
               type="button"
               onClick={() => {
