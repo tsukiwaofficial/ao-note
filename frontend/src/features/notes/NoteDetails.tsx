@@ -4,6 +4,8 @@ import { useNoteContext } from "./useNoteContext";
 import { Link } from "react-router-dom";
 import { deleteNote } from "./delete-note.util";
 import NoteDate from "./NoteDate";
+import { Button } from "../../components/ui/Button";
+import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
 
 export default function NoteDetails({
   _id,
@@ -38,16 +40,16 @@ export default function NoteDetails({
           updatedAt={updatedAt}
         />
         <div className="h-max flex flex-col md:flex-row-reverse xl:flex-col items-center justify-center md:justify-start">
-          <button
-            type="button"
+          <Button
+            variant="icon"
             onClick={() => deleteNote(_id, dispatch)}
-            className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
+            className="hover:bg-error"
           >
             <FaTrash />
-          </button>
+          </Button>
           <Link
             to={`/${_id}`}
-            className="rounded-full p-4 hover:bg-primary hover:text-white transition-colors"
+            className={`${buttonVariants({ variant: "icon" })} hover:bg-primary`}
           >
             <FaPencil />
           </Link>

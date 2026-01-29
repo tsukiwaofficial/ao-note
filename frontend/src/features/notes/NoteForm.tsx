@@ -7,7 +7,9 @@ import { notePlaceholders } from "../placeholders/placeholders.config";
 import { getPlaceholder } from "../placeholders/get-placeholder.util";
 import { handleKeyDown } from "./note-keydown.util";
 import Section from "../../layouts/Section";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import BackBtn from "../../components/buttons/BackBtn";
+import { Button } from "../../components/ui/Button";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -109,18 +111,10 @@ export default function NoteForm() {
           </div>
         </div>
         <div className="flex xl:flex-col gap-5">
-          <Link
-            to="/"
-            className="p-4 ml-auto rounded-lg cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant transition-colors"
-          >
-            Back
-          </Link>
-          <button
-            type="submit"
-            className="rounded-lg p-4 cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant  transition-colors"
-          >
+          <BackBtn />
+          <Button type="submit" variant="cta" className="">
             Add
-          </button>
+          </Button>
         </div>
       </form>
     </Section>
