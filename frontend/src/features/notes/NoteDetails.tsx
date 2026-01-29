@@ -1,9 +1,9 @@
-import { formatDistanceToNow } from "date-fns";
 import type { Note } from "./note.types";
 import { FaTrash, FaPencil } from "react-icons/fa6";
 import { useNoteContext } from "./useNoteContext";
 import { Link } from "react-router-dom";
 import { deleteNote } from "./delete-note.util";
+import NoteDate from "./NoteDate";
 
 export default function NoteDetails({
   _id,
@@ -15,49 +15,43 @@ export default function NoteDetails({
   const { dispatch } = useNoteContext();
 
   return (
-    <div className="overflow-hidden w-full shadow bg-surface rounded-lg flex items-center justify-between hover:-translate-y-2 hover:shadow-xl group transition-[shadow_transform]">
+    <div className="overflow-hidden w-full max-w-250 shadow bg-surface rounded-lg flex md:flex-col xl:flex-row items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-[shadow_transform]">
       <Link to={`/${_id}`} className="w-full p-8">
-        <div className="space-y-8 w-full max-w-200">
+        <div className="space-y-8 md:space-y-0 xl:space-y-8 w-full max-w-200">
           <div className="flex flex-col">
             <h5 className="line-clamp-1 text-primary mb-1">{title}</h5>
-            <p className="line-clamp-2">{content}</p>
+            <p className="line-clamp-2 md:line-clamp-3 xl:line-clamp-2">
+              {content}
+            </p>
           </div>
-          {createdAt && (
-            <span className="text-sm text-slate-400">
-              Created{" "}
-              {formatDistanceToNow(new Date(createdAt), {
-                addSuffix: true,
-                includeSeconds: true,
-              })}
-            </span>
-          )}
-          {updatedAt && createdAt !== updatedAt && (
-            <span className="text-sm text-slate-400">
-              {" "}
-              (Updated{" "}
-              {formatDistanceToNow(new Date(updatedAt), {
-                addSuffix: true,
-                includeSeconds: true,
-              })}
-              )
-            </span>
-          )}
+          <NoteDate
+            className="md:hidden xl:block"
+            createdAt={createdAt}
+            updatedAt={updatedAt}
+          />
         </div>
       </Link>
-      <div className="flex flex-col items-center justify-center h-full p-8">
-        <button
-          type="button"
-          onClick={() => deleteNote(_id, dispatch)}
-          className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
-        >
-          <FaTrash />
-        </button>
-        <Link
-          to={`/${_id}`}
-          className="rounded-full p-4 hover:bg-primary hover:text-white transition-colors"
-        >
-          <FaPencil />
-        </Link>
+      <div className="space-y-1 p-8 md:w-full xl:w-max">
+        <NoteDate
+          className="hidden md:block xl:hidden"
+          createdAt={createdAt}
+          updatedAt={updatedAt}
+        />
+        <div className="h-max flex flex-col md:flex-row-reverse xl:flex-col items-center justify-center md:justify-start">
+          <button
+            type="button"
+            onClick={() => deleteNote(_id, dispatch)}
+            className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
+          >
+            <FaTrash />
+          </button>
+          <Link
+            to={`/${_id}`}
+            className="rounded-full p-4 hover:bg-primary hover:text-white transition-colors"
+          >
+            <FaPencil />
+          </Link>
+        </div>
       </div>
     </div>
   );

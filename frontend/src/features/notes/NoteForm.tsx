@@ -6,6 +6,8 @@ import { timer } from "../../shared/utils/timer.util";
 import { notePlaceholders } from "../placeholders/placeholders.config";
 import { getPlaceholder } from "../placeholders/get-placeholder.util";
 import { handleKeyDown } from "./note-keydown.util";
+import Section from "../../layouts/Section";
+import { Link, useNavigate } from "react-router-dom";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -18,6 +20,7 @@ export default function NoteForm() {
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
   const { dispatch } = useNoteContext();
+  const navigate = useNavigate();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -61,73 +64,65 @@ export default function NoteForm() {
     }
 
     dispatch({ type: "ADD_NOTE", payload: result });
-
-    setNoteData({
-      title: "",
-      content: "",
-    });
+    navigate("/");
     setError("");
     setEmptyFields([]);
   };
 
   return (
-    <div className="relative space-y-5">
-      <h3 className="">Add Note</h3>
-      <img
+    <Section className="px-[5vw]">
+      {/* <img
         src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaDV0ZGtxbms5bXg1aGY2OXNwM3NrdG4zMmU5djZrMjhsemUxOG92eCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/boOoHL2PAFXahZyObR/giphy.gif"
         alt=""
         className="absolute max-w-70 -top-45 -right-20"
-      />
+      /> */}
       <form
-        className={`space-y-8 w-125 bg-surface shadow-lg rounded-lg p-10 overflow-hidden hover:shadow-2xl hover:-translate-y-2 hover:z-10 transition-[shadow_transform] ${error && "animate-shake"}`}
+        className={`w-full flex flex-col xl:flex-row items-end xl:items-start justify-between gap-10 ${error && "animate-shake"}`}
         onSubmit={handleSubmit}
       >
-        <div className="space-y-4">
-          <div className="flex flex-col">
-            <label htmlFor="title" className="mb-2 text-primary font-semibold">
-              Title
-            </label>
-            <input
-              type="text"
+        <div className="w-full h-max">
+          <div className="w-full flex flex-col gap-11 cursor-text">
+            <textarea
               name="title"
               id="title"
-              className={`${emptyFields.includes("title") ? "border-error focus:outline-none" : ""} note-form`}
-              placeholder={titlePlaceholder}
+              className={`${emptyFields.includes("title") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content resize-none text-3xl font-bold text-primary transition-colors`}
+              placeholder={`Type here the title of your note. For example, ${titlePlaceholder}`}
               value={noteData.title}
               onChange={handleInputChange}
               onKeyDown={(event) => handleKeyDown(event, handleSubmit)}
+              autoFocus
             />
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="content"
-              className="mb-2 text-primary font-semibold"
-            >
-              Content
-            </label>
             <textarea
               name="content"
               id="content"
-              className={`${emptyFields.includes("content") ? "border-error focus:outline-none" : ""} field-sizing-content resize-none min-h-50 note-form`}
+              className={`${emptyFields.includes("content") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content min-h-15 resize-none`}
               placeholder={contentPlaceholder}
               value={noteData.content}
               onChange={handleInputChange}
               onKeyDown={(event) => handleKeyDown(event, handleSubmit)}
             />
           </div>
+          <div
+            className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max mt-30 transition-[opacity_height]`}
+          >
+            {error}
+          </div>
         </div>
-        <button
-          type="submit"
-          className="rounded-lg p-4 cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant  transition-colors"
-        >
-          Create Note
-        </button>
-        <div
-          className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 h-max" : "h-0"} w-max transition-[opacity_height]`}
-        >
-          {error}
+        <div className="flex xl:flex-col gap-5">
+          <Link
+            to="/"
+            className="p-4 ml-auto rounded-lg cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant transition-colors"
+          >
+            Back
+          </Link>
+          <button
+            type="submit"
+            className="rounded-lg p-4 cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant  transition-colors"
+          >
+            Add
+          </button>
         </div>
       </form>
-    </div>
+    </Section>
   );
 }

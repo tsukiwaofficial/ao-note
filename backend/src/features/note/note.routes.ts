@@ -12,6 +12,7 @@ const router: Router = express.Router();
 router.get("/", getNotes);
 router.get("/:id", getNote);
 router.post("/", createNote);
+router.post("/add-note", createNote);
 router.delete("/:id", deleteNote);
 router.put("/:id", updateNote);
 
