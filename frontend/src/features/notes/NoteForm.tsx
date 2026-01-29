@@ -7,7 +7,10 @@ import { notePlaceholders } from "../placeholders/placeholders.config";
 import { getPlaceholder } from "../placeholders/get-placeholder.util";
 import { handleKeyDown } from "./note-keydown.util";
 import Section from "../../layouts/Section";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import BackBtn from "../../components/buttons/BackBtn";
+import { Button } from "../../components/ui/Button";
+import { Form } from "../../components/ui/Form";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -76,10 +79,7 @@ export default function NoteForm() {
         alt=""
         className="absolute max-w-70 -top-45 -right-20"
       /> */}
-      <form
-        className={`w-full flex flex-col xl:flex-row items-end xl:items-start justify-between gap-10 ${error && "animate-shake"}`}
-        onSubmit={handleSubmit}
-      >
+      <Form className={error && "animate-shake"} onSubmit={handleSubmit}>
         <div className="w-full h-max">
           <div className="w-full flex flex-col gap-11 cursor-text">
             <textarea
@@ -109,20 +109,12 @@ export default function NoteForm() {
           </div>
         </div>
         <div className="flex xl:flex-col gap-5">
-          <Link
-            to="/"
-            className="p-4 ml-auto rounded-lg cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant transition-colors"
-          >
-            Back
-          </Link>
-          <button
-            type="submit"
-            className="rounded-lg p-4 cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant  transition-colors"
-          >
+          <BackBtn />
+          <Button type="submit" variant="cta" className="">
             Add
-          </button>
+          </Button>
         </div>
-      </form>
+      </Form>
     </Section>
   );
 }

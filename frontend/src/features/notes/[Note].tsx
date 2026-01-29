@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { Note } from "./note.types";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNoteContext } from "./useNoteContext";
@@ -8,6 +8,8 @@ import { deleteNote } from "./delete-note.util";
 import Section from "../../layouts/Section";
 import { handleKeyDown } from "./note-keydown.util";
 import NoteDate from "./NoteDate";
+import BackBtn from "../../components/buttons/BackBtn";
+import { Form } from "../../components/ui/Form";
 
 export default function Note() {
   const { id } = useParams();
@@ -110,10 +112,7 @@ export default function Note() {
 
   return (
     <Section className="px-[5vw]">
-      <form
-        className={`w-full flex flex-col xl:flex-row items-end xl:items-start justify-between gap-10 ${error && "animate-shake"}`}
-        onSubmit={updateNote}
-      >
+      <Form className={error && "animate-shake"} onSubmit={updateNote}>
         <div className="w-full h-max">
           <div
             onClick={() => setIsUpdating(true)}
@@ -187,14 +186,9 @@ export default function Note() {
               </button>
             )}
           </div>
-          <Link
-            to="/"
-            className="p-4 ml-auto rounded-lg cursor-pointer border-2 border-transparent bg-primary font-semibold text-slate-200 hover:bg-primary-variant transition-colors"
-          >
-            Back
-          </Link>
+          <BackBtn />
         </div>
-      </form>
+      </Form>
     </Section>
   );
 }
