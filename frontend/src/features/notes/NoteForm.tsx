@@ -10,6 +10,7 @@ import Section from "../../layouts/Section";
 import { useNavigate } from "react-router-dom";
 import BackBtn from "../../components/buttons/BackBtn";
 import { Button } from "../../components/ui/Button";
+import { Form } from "../../components/ui/Form";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -78,10 +79,7 @@ export default function NoteForm() {
         alt=""
         className="absolute max-w-70 -top-45 -right-20"
       /> */}
-      <form
-        className={`w-full flex flex-col xl:flex-row items-end xl:items-start justify-between gap-10 ${error && "animate-shake"}`}
-        onSubmit={handleSubmit}
-      >
+      <Form className={error && "animate-shake"} onSubmit={handleSubmit}>
         <div className="w-full h-max">
           <div className="w-full flex flex-col gap-11 cursor-text">
             <textarea
@@ -116,7 +114,7 @@ export default function NoteForm() {
             Add
           </Button>
         </div>
-      </form>
+      </Form>
     </Section>
   );
 }
