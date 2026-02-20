@@ -4,12 +4,16 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNoteContext } from "./useNoteContext";
 import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
 import { timer } from "../../shared/utils/timer.util";
-import { deleteNote } from "./delete-note.util";
 import Section from "../../layouts/Section";
 import { handleKeyDown } from "./note-keydown.util";
 import NoteDate from "./NoteDate";
 import BackBtn from "../../components/buttons/BackBtn";
 import { Form } from "../../components/ui/Form";
+import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
+import { useAuthContext } from "../user/useAuthContext";
+import { guestNotes } from "../user/user.config";
+import { useDeleteNote } from "./useDeleteNote";
+import { putOptions } from "../../shared/utils/http/fetch-options.utils";
 
 export default function Note() {
   const { id } = useParams();
@@ -19,6 +23,8 @@ export default function Note() {
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
+  const { state: user } = useAuthContext();
+  const { deleteNote } = useDeleteNote();
 
   const handleUpdateChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -38,41 +44,60 @@ export default function Note() {
         content: noteData.content.trim(),
       };
 
-      const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "/notes/" + noteData._id,
-        {
-          method: "PUT",
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const guestPayload = {
+        ...payload,
+        updatedAt: new Date().toISOString(),
+      };
 
-      const result = await response.json();
+      if (user.role === "user") {
+        const response = await aoNoteFetch(`/notes/${noteData._id}`, {
+          ...putOptions<Note>(payload),
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
 
-      if (!response.ok) {
-        setError(result.message);
-        if (result.emptyFields) {
-          switch (true) {
-            case result.emptyFields.includes("title"):
-              setEmptyFields(result.emptyFields);
-              break;
-            case result.emptyFields.includes("content"):
-              setEmptyFields(result.emptyFields);
-              break;
+        const result = await response.json();
+
+        if (!response.ok) {
+          setError(result.message);
+          if (result.emptyFields) {
+            switch (true) {
+              case result.emptyFields.includes("title"):
+                setEmptyFields(result.emptyFields);
+                break;
+              case result.emptyFields.includes("content"):
+                setEmptyFields(result.emptyFields);
+                break;
+            }
           }
+
+          await timer(3);
+          setError("");
+
+          return;
         }
 
-        await timer(3);
-        setError("");
+        dispatch({
+          type: "UPDATE_NOTE",
+          payload: { ...payload },
+        });
+        setNoteData(payload);
+      } else {
+        const localResult = localStorage.getItem(guestNotes);
+        const parsedLocalNotes = localResult
+          ? (JSON.parse(localResult) as Note[])
+          : [];
 
-        return;
+        const updatedNotes = parsedLocalNotes.map((note) =>
+          note._id === noteData._id ? { ...guestPayload } : note,
+        );
+
+        localStorage.setItem(guestNotes, JSON.stringify(updatedNotes));
+        dispatch({ type: "UPDATE_NOTE", payload: guestPayload });
+        setNoteData(guestPayload);
       }
 
-      dispatch({
-        type: "UPDATE_NOTE",
-        payload: { ...payload },
-      });
-      setNoteData(payload);
       setEmptyFields([]);
       setIsUpdating(false);
     }
@@ -95,9 +120,12 @@ export default function Note() {
 
   useEffect(() => {
     const getNote = async () => {
-      const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + `/notes/${id}`,
-      );
+      const response = await aoNoteFetch(`/notes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
       const result = await response.json();
 
       if (!response.ok)
@@ -107,8 +135,23 @@ export default function Note() {
       setNoteData(result);
     };
 
-    getNote();
-  }, [dispatch, id]);
+    const getLocalNote = async () => {
+      const existingLocalNotes = localStorage.getItem(guestNotes);
+
+      if (existingLocalNotes) {
+        const parsedLocalNotes = JSON.parse(existingLocalNotes) as Note[];
+
+        const note = parsedLocalNotes.find((note) => note._id === id);
+
+        if (note) {
+          dispatch({ type: "GET_NOTE", payload: note });
+          setNoteData(note);
+        }
+      }
+    };
+    if (user.role === "user") getNote();
+    else getLocalNote();
+  }, [user, dispatch, id]);
 
   return (
     <Section className="px-[5vw]">
