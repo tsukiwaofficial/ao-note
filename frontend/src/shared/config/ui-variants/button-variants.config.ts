@@ -7,8 +7,8 @@ export const buttonVariants = cva(
       variant: {
         default: "border-primary bg-primary/50 text-slate-200 hover:bg-primary",
         icon: "rounded-full border-transparent",
-        cta: "rounded-lg bg-primary text-slate-200 hover:bg-primary-variant transition-colors",
-        outline: "text-primary border-primary hover:bg-primary  rounded-lg ",
+        cta: "rounded-lg border-transparent bg-primary text-slate-200 hover:bg-primary-variant transition-colors",
+        outline: "text-primary border-primary hover:bg-primary rounded-lg",
       },
     },
     defaultVariants: {

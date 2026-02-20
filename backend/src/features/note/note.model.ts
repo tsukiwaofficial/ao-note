@@ -1,9 +1,11 @@
+import { Types } from "mongoose";
 import { Model, Schema } from "../../shared/lib/mongoose";
 import { noteStatics } from "./note.statics";
 import type { NoteDocument, NoteDocumentModel } from "./note.types";
 
 const NoteSchema = new Schema<NoteDocument, NoteDocumentModel>(
   {
+    userId: { type: Types.ObjectId, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
   },

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Note } from "../features/notes/note.types";
 import NoteDetails from "../features/notes/NoteDetails";
 import { useNoteContext } from "../features/notes/useNoteContext";
@@ -6,22 +6,53 @@ import Banner from "../components/Banner";
 import Section from "../layouts/Section";
 import { FaPlus } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../features/user/useAuthContext";
+import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
+import { guestNotes } from "../features/user/user.config";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function Home() {
   const { state: notes, dispatch } = useNoteContext();
+  const { state: user } = useAuthContext();
+  const [loading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const getNotes = async () => {
-      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/notes");
+      setIsLoading(true);
+      const response = await aoNoteFetch("/notes", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const result = await response.json();
 
       if (response.ok) {
         dispatch({ type: "GET_NOTES", payload: result });
       }
+      setIsLoading(false);
     };
 
-    getNotes();
-  }, [dispatch]);
+    const getLocalNotes = async () => {
+      setIsLoading(true);
+      const localResult = localStorage.getItem(guestNotes);
+
+      const parsedLocalNotes = localResult
+        ? (JSON.parse(localResult) as Note[])
+        : [];
+
+      const sortedNotes = parsedLocalNotes.sort((noteA, noteB) => {
+        const dateA = new Date(noteA.updatedAt as string).getTime();
+        const dateB = new Date(noteB.updatedAt as string).getTime();
+        return dateB - dateA;
+      });
+
+      dispatch({ type: "GET_NOTES", payload: sortedNotes });
+      setIsLoading(false);
+    };
+
+    if (user.role === "user") getNotes();
+    else if (user.role === "guest") getLocalNotes();
+  }, [user, dispatch]);
 
   return (
     <Section>
@@ -36,7 +67,9 @@ export default function Home() {
             Add Note
           </Link>
           <div className="h-max grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
-            {notes.length > 0 ? (
+            {loading ? (
+              <LoadingSpinner className="mx-auto my-20 text-5xl" />
+            ) : notes.length > 0 ? (
               notes.map(
                 ({ _id, title, content, createdAt, updatedAt }: Note) => (
                   <NoteDetails
@@ -50,7 +83,7 @@ export default function Home() {
                 ),
               )
             ) : (
-              <div className="">No notes found</div>
+              <div className="text-slate-500 mx-auto my-20">No notes found</div>
             )}
           </div>
         </div>

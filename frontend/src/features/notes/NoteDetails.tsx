@@ -2,10 +2,10 @@ import type { Note } from "./note.types";
 import { FaTrash, FaPencil } from "react-icons/fa6";
 import { useNoteContext } from "./useNoteContext";
 import { Link } from "react-router-dom";
-import { deleteNote } from "./delete-note.util";
 import NoteDate from "./NoteDate";
 import { Button } from "../../components/ui/Button";
 import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
+import { useDeleteNote } from "./useDeleteNote";
 
 export default function NoteDetails({
   _id,
@@ -15,6 +15,7 @@ export default function NoteDetails({
   updatedAt,
 }: Note) {
   const { dispatch } = useNoteContext();
+  const { deleteNote } = useDeleteNote();
 
   return (
     <div className="overflow-hidden w-full max-w-250 shadow bg-surface rounded-lg flex md:flex-col xl:flex-row items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-[shadow_transform]">

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { Note } from "./note.types";
-import { postOptions } from "../../shared/utils/http/post.options";
+import { postOptions } from "../../shared/utils/http/fetch-options.utils";
 import { useNoteContext } from "./useNoteContext";
 import { timer } from "../../shared/utils/timer.util";
 import { notePlaceholders } from "../placeholders/placeholders.config";
@@ -11,6 +11,10 @@ import { useNavigate } from "react-router-dom";
 import BackBtn from "../../components/buttons/BackBtn";
 import { Button } from "../../components/ui/Button";
 import { Form } from "../../components/ui/Form";
+import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
+import { useAuthContext } from "../user/useAuthContext";
+import { guestNotes } from "../user/user.config";
+import { v4 as uuidv4 } from "uuid";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
@@ -24,6 +28,7 @@ export default function NoteForm() {
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
   const { dispatch } = useNoteContext();
   const navigate = useNavigate();
+  const { state: user } = useAuthContext();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -40,33 +45,52 @@ export default function NoteForm() {
       content: noteData.content.trim(),
     };
 
-    const response = await fetch(
-      import.meta.env.VITE_BACKEND_URL + "/notes",
-      postOptions<Note>(payload),
-    );
+    const guestPayload = {
+      _id: uuidv4(),
+      ...payload,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    const result = await response.json();
+    if (user.role === "user") {
+      const response = await aoNoteFetch("/notes", {
+        ...postOptions<Note>(payload),
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
 
-    if (!response.ok) {
-      setError(result.message);
-      if (result.emptyFields) {
-        switch (true) {
-          case result.emptyFields.includes("title"):
-            setEmptyFields(result.emptyFields);
-            break;
-          case result.emptyFields.includes("content"):
-            setEmptyFields(result.emptyFields);
-            break;
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message);
+        if (result.emptyFields) {
+          switch (true) {
+            case result.emptyFields.includes("title"):
+              setEmptyFields(result.emptyFields);
+              break;
+            case result.emptyFields.includes("content"):
+              setEmptyFields(result.emptyFields);
+              break;
+          }
         }
+
+        await timer(3);
+        setError("");
+
+        return;
       }
 
-      await timer(3);
-      setError("");
+      dispatch({ type: "ADD_NOTE", payload: result });
+    } else {
+      const existingNotes = localStorage.getItem(guestNotes);
+      const parsedLocalNotes = existingNotes ? JSON.parse(existingNotes) : [];
+      parsedLocalNotes.push(guestPayload);
+      localStorage.setItem(guestNotes, JSON.stringify(parsedLocalNotes));
 
-      return;
+      dispatch({ type: "ADD_NOTE", payload: guestPayload });
     }
 
-    dispatch({ type: "ADD_NOTE", payload: result });
     navigate("/");
     setError("");
     setEmptyFields([]);
