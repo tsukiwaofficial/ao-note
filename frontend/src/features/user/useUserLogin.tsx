@@ -8,6 +8,7 @@ import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { jwtDecoder } from "./jwt-decoder.util";
 import { guestToken } from "./user.config";
 import { useNoteContext } from "../notes/useNoteContext";
+import { formChecker } from "../../shared/utils/form-checker.util";
 
 export const useUserLogin = () => {
   const navigate = useNavigate();
@@ -27,12 +28,7 @@ export const useUserLogin = () => {
     setIsLoading(true);
     setErrorFields([]);
 
-    const userDataKeys = Object.keys(userData);
-
-    const emptyKeys = userDataKeys.filter((key) => {
-      const value = userData[key as keyof User];
-      return value === "" || value === null || value === undefined;
-    });
+    const emptyKeys = formChecker<User>(userData);
 
     if (emptyKeys.length > 0) {
       setErrorFields((prevState) => [...prevState, ...emptyKeys]);
