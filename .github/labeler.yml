@@ -10,7 +10,9 @@ release:
 - head-branch: release/*
 
 chore:
-- head-branch: chore/*
+- head-branch: 
+  - chore/*
+  - refactor/*
 
 ui/ux:
 - changed-files:
@@ -41,3 +43,4 @@ dependencies:
 - changed-files:
 
   - any-glob-to-any-file: 'pnpm-lock.yaml'
+
