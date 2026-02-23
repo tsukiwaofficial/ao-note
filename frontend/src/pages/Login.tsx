@@ -1,18 +1,20 @@
+import { useState } from "react";
+import { useAuthContext } from "../features/user/useAuthContext";
+import { useUserLogin } from "../features/user/useUserLogin";
+import Section from "../layouts/Section";
 import { Link, Navigate } from "react-router-dom";
-import { Button } from "../../components/ui/Button";
-import { Form } from "../../components/ui/Form";
-import Section from "../../layouts/Section";
-import { FaUser, FaLock } from "react-icons/fa6";
-import { useUserLogin } from "./useUserLogin";
-import { useAuthContext } from "./useAuthContext";
-import { getNekosiaImage } from "../../shared/utils/get-nekosia.util";
+import { Form } from "../components/ui/Form";
+import { FaUser } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa6";
+import { Button } from "../components/ui/Button";
+import AuthBanner from "../components/AuthBanner";
 
-const { image, source, tags, attribution } = await getNekosiaImage();
-
-export default function UserLogin() {
+export default function Login() {
   const { userData, setUserData, error, errorFields, isLoading, login } =
     useUserLogin();
   const { state: user } = useAuthContext();
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -27,24 +29,18 @@ export default function UserLogin() {
     await login(userData.username, userData.password);
   };
 
+  const handleShowPasswordToggle = () => {
+    setShowPassword((prevState) => !prevState);
+  };
+
   if (user.role !== "user")
     return (
       <Section>
         <div
           className={`overflow-hidden relative grid grid-cols-4 rounded-xl shadow-xl ${error && "animate-shake"}`}
         >
-          <Link to={source} target="_blank" className="col-span-2 h-230">
-            <img
-              src={image}
-              alt={tags}
-              className="object-cover w-full h-full"
-            />
-          </Link>
-          <img
-            src={image}
-            alt={tags}
-            className="object-cover h-full w-full absolute -z-1"
-          />
+          <AuthBanner page="login" mode="display" />
+          <AuthBanner page="login" mode="background" />
           <Form
             onSubmit={handleLogin}
             variant="login"
@@ -54,14 +50,16 @@ export default function UserLogin() {
             <div className="space-y-6">
               <div className="flex flex-col">
                 <label htmlFor="username">Username</label>
-                <span className="relative flex items-center">
+                <span
+                  className={`relative flex items-center border-b-2 ${errorFields.includes("username") ? "border-error" : "border-gray-400"} transition-colors`}
+                >
                   <FaUser className="absolute text-gray-400 pointer-events-none" />
                   <input
                     type="username"
                     id="username"
                     name="username"
                     placeholder="Username"
-                    className={`${errorFields.includes("username") ? "border-error" : "border-gray-400"} w-full border-b-2 rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent`}
+                    className="w-full px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
                     value={userData.username}
                     onChange={handleInputChange}
                     autoFocus
@@ -70,18 +68,27 @@ export default function UserLogin() {
               </div>
               <div className="flex flex-col">
                 <label htmlFor="password">Password</label>
-                <span className="flex items-center">
+                <div
+                  className={`relative flex items-center border-b-2 ${errorFields.includes("password") ? "border-error" : "border-gray-400"}`}
+                >
                   <FaLock className="absolute text-gray-400 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     name="password"
                     placeholder="Password"
-                    className={`${errorFields.includes("password") ? "border-error" : "border-gray-400"} w-full border-b-2 rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent`}
+                    className="w-full px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
                     value={userData.password}
                     onChange={handleInputChange}
                   />
-                </span>
+
+                  <span
+                    className="ml-auto cursor-pointer p-4 text-2xl opacity-50 hover:opacity-100 transition-opacity"
+                    onClick={handleShowPasswordToggle}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
               </div>
               <div
                 className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max transition-[opacity_height]`}
@@ -105,21 +112,6 @@ export default function UserLogin() {
               >
                 Click here to Sign Up!
               </Link>
-            </div>
-            <div className="flex flex-col gap-5 items-center">
-              <p className="text-sm text-right text-slate-600">
-                {attribution.artist.profile && "Image by"}{" "}
-                <Link
-                  to={attribution.artist.profile}
-                  target="_blank"
-                  className="font-semibold text-primary underline"
-                >
-                  {attribution.artist.username && attribution.artist.username}
-                </Link>
-              </p>
-              <p className="text-sm text-center text-slate-500">
-                {attribution.copyright && attribution.copyright}
-              </p>
             </div>
           </Form>
         </div>
