@@ -7,6 +7,7 @@ import { useUserSignup } from "../features/user/useUserSignup";
 import { useAuthContext } from "../features/user/useAuthContext";
 import { useState } from "react";
 import AuthBanner from "../components/AuthBanner";
+import Error from "../components/Error";
 
 export default function Signup() {
   const { userData, setUserData, error, errorFields, isLoading, signup } =
@@ -116,11 +117,7 @@ export default function Signup() {
                   </span>
                 </span>
               </div>
-              <div
-                className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max transition-[opacity_height]`}
-              >
-                {error}
-              </div>
+              <Error error={error} />
             </div>
             <Button
               type="submit"

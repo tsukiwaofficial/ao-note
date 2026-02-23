@@ -8,6 +8,7 @@ import { FaUser } from "react-icons/fa";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa6";
 import { Button } from "../components/ui/Button";
 import AuthBanner from "../components/AuthBanner";
+import Error from "../components/Error";
 
 export default function Login() {
   const { userData, setUserData, error, errorFields, isLoading, login } =
@@ -90,11 +91,7 @@ export default function Login() {
                   </span>
                 </div>
               </div>
-              <div
-                className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max transition-[opacity_height]`}
-              >
-                {error}
-              </div>
+              <Error error={error} />
             </div>
             <Button
               type="submit"
