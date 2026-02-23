@@ -1,18 +1,21 @@
 import { Link, Navigate } from "react-router-dom";
-import { Button } from "../../components/ui/Button";
-import { Form } from "../../components/ui/Form";
-import Section from "../../layouts/Section";
-import { FaUser, FaLock } from "react-icons/fa6";
-import { useUserSignup } from "./useUserSignup";
-import { useAuthContext } from "./useAuthContext";
-import { getNekosiaImage } from "../../shared/utils/get-nekosia.util";
+import { Button } from "../components/ui/Button";
+import { Form } from "../components/ui/Form";
+import Section from "../layouts/Section";
+import { FaUser, FaLock, FaEyeSlash, FaEye } from "react-icons/fa6";
+import { useUserSignup } from "../features/user/useUserSignup";
+import { useAuthContext } from "../features/user/useAuthContext";
+import { useState } from "react";
+import AuthBanner from "../components/AuthBanner";
 
-const { image, source, tags, attribution } = await getNekosiaImage();
-
-export default function UserSignup() {
+export default function Signup() {
   const { userData, setUserData, error, errorFields, isLoading, signup } =
     useUserSignup();
   const { state: user } = useAuthContext();
+  const [showPassword, setShowPassword] = useState<{
+    pass: boolean;
+    confirmPass: boolean;
+  }>({ pass: false, confirmPass: false });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -27,24 +30,21 @@ export default function UserSignup() {
     await signup(userData.username, userData.password);
   };
 
+  const handleShowPasswordToggle = (field: "pass" | "confirmPass") => {
+    setShowPassword((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
+  };
+
   if (user.role !== "user")
     return (
       <Section>
         <div
           className={`overflow-hidden relative grid grid-cols-4 rounded-xl shadow-xl ${error && "animate-shake"}`}
         >
-          <Link
-            to={source}
-            target="_blank"
-            className="col-span-2 h-230 order-1"
-          >
-            <img src={image} alt="" className="object-cover w-full h-full" />
-          </Link>
-          <img
-            src={image}
-            alt={tags}
-            className="object-cover h-full w-full absolute -z-1"
-          />
+          <AuthBanner page="signup" mode="display" className="order-2" />
+          <AuthBanner page="signup" mode="background" />
           <Form
             onSubmit={handleSignup}
             variant="login"
@@ -54,14 +54,16 @@ export default function UserSignup() {
             <div className="space-y-6">
               <div className="flex flex-col">
                 <label htmlFor="username">Username</label>
-                <span className="relative flex items-center">
+                <span
+                  className={`relative flex items-center border-b-2 ${errorFields.includes("username") ? "border-error" : "border-gray-400"} transition-colors`}
+                >
                   <FaUser className="absolute text-gray-400 pointer-events-none" />
                   <input
                     type="username"
                     id="username"
                     name="username"
                     placeholder="Username"
-                    className={`${errorFields.includes("username") ? "border-error" : "border-gray-400"} w-full border-b-2 rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent`}
+                    className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
                     value={userData.username}
                     onChange={handleInputChange}
                     autoFocus
@@ -70,32 +72,48 @@ export default function UserSignup() {
               </div>
               <div className="flex flex-col">
                 <label htmlFor="password">Password</label>
-                <span className="flex items-center">
+                <span
+                  className={`relative flex items-center border-b-2 ${errorFields.includes("password") ? "border-error" : "border-gray-400"} transition-colors`}
+                >
                   <FaLock className="absolute text-gray-400 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showPassword.pass ? "text" : "password"}
                     id="password"
                     name="password"
                     placeholder="Password"
-                    className={`${errorFields.includes("password") ? "border-error" : "border-gray-400"} w-full border-b-2 rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent`}
+                    className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
                     value={userData.password}
                     onChange={handleInputChange}
                   />
+                  <span
+                    className="ml-auto cursor-pointer p-4 text-2xl opacity-50 hover:opacity-100 transition-opacity"
+                    onClick={() => handleShowPasswordToggle("pass")}
+                  >
+                    {showPassword.pass ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                 </span>
               </div>
               <div className="flex flex-col">
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <span className="flex items-center">
+                <span
+                  className={`relative flex items-center border-b-2 ${errorFields.includes("confirmPassword") ? "border-error" : "border-gray-400"} transition-colors`}
+                >
                   <FaLock className="absolute text-gray-400 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showPassword.confirmPass ? "text" : "password"}
                     id="confirmPassword"
                     name="confirmPassword"
                     placeholder="Confirm Password"
-                    className={`${errorFields.includes("confirmPassword") ? "border-error" : "border-gray-400"} w-full border-b-2 rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent`}
+                    className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
                     value={userData.confirmPassword}
                     onChange={handleInputChange}
                   />
+                  <span
+                    className="ml-auto cursor-pointer p-4 text-2xl opacity-50 hover:opacity-100 transition-opacity"
+                    onClick={() => handleShowPasswordToggle("confirmPass")}
+                  >
+                    {showPassword.confirmPass ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                 </span>
               </div>
               <div
@@ -120,21 +138,6 @@ export default function UserSignup() {
               >
                 Click here to Login!
               </Link>
-            </div>
-            <div className="flex flex-col gap-5 items-center">
-              <p className="text-sm text-right text-slate-600">
-                {attribution.artist.profile && "Image by"}{" "}
-                <Link
-                  to={attribution.artist.profile}
-                  target="_blank"
-                  className="font-semibold text-primary underline"
-                >
-                  {attribution.artist.username && attribution.artist.username}
-                </Link>
-              </p>
-              <p className="text-sm text-center text-slate-500">
-                {attribution.copyright && attribution.copyright}
-              </p>
             </div>
           </Form>
         </div>

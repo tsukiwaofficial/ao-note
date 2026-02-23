@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Note from "./features/notes/[Note]";
 import NoteForm from "./features/notes/NoteForm";
-import UserLogin from "./features/user/UserLogin";
-import UserSignUp from "./features/user/UserSignup";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 // providers
 import NoteProvider from "./features/notes/NoteProvider";
@@ -26,8 +26,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/:id" element={<Note />} />
             <Route path="/add-note" element={<NoteForm />} />
-            <Route path="/login" element={<UserLogin />} />
-            <Route path="/signup" element={<UserSignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </NoteProvider>
         <Footer />
