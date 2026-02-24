@@ -15,11 +15,11 @@
 @layer base {
   html,
   body {
-    @apply duration-150;
+    @apply h-full duration-150;
   }
 
   body {
-    @apply bg-no-repeat bg-background text-lg lg:text-xl text-slate-600 font-poppins m-0;
+    @apply bg-background text-lg lg:text-xl text-slate-600 font-poppins m-0;
   }
 
   ::selection {
@@ -61,7 +61,11 @@
 
   input,
   textarea {
-    @apply bg-white rounded-lg border-2 border-transparent outline-primary caret-primary;
+    @apply bg-white rounded-lg outline-primary caret-primary;
+  }
+
+  textarea {
+    @apply resize-none field-sizing-content text-wrap overflow-hidden;
   }
 
   button,
@@ -70,8 +74,12 @@
   }
 }
 
+#root {
+  @apply grid grid-rows-[1fr_auto] min-h-dvh;
+}
+
 @utility ao-note-container {
-  @apply container mx-auto px-[5vw];
+  @apply container mx-auto px-[5vw] w-full h-full;
 }
 
 @utility fixed-center {
