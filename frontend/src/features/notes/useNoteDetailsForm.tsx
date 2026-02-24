@@ -1,24 +1,16 @@
-import { useNavigate, useParams } from "react-router-dom";
-import type { Note } from "./note.types";
-import { useEffect, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { useNoteContext } from "./useNoteContext";
-import { FaTrash, FaPencil, FaCheck, FaXmark } from "react-icons/fa6";
-import { timer } from "../../shared/utils/timer.util";
-import Section from "../../layouts/Section";
-import { handleKeyDown } from "./note-keydown.util";
-import NoteDate from "./NoteDate";
-import BackBtn from "../../components/buttons/BackBtn";
-import { Form } from "../../components/ui/Form";
-import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
+import { useEffect, useState, type FormEvent } from "react";
+import type { Note } from "./note.types";
 import { useAuthContext } from "../user/useAuthContext";
-import { guestNotes } from "../user/user.config";
 import { useDeleteNote } from "./useDeleteNote";
-import { putOptions } from "../../shared/utils/http/fetch-options.utils";
-import AoNoteError from "../../components/AoNoteError";
 import { formChecker } from "../../shared/utils/form-checker.util";
+import { timer } from "../../shared/utils/timer.util";
+import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
+import { putOptions } from "../../shared/utils/http/fetch-options.utils";
+import { guestNotes } from "../user/user.config";
 
-export default function Note() {
-  const { id } = useParams();
+export const useNoteDetailsForm = (id: string) => {
   const navigate = useNavigate();
   const { state: note, dispatch } = useNoteContext();
   const [noteData, setNoteData] = useState<Note>({} as Note);
@@ -127,7 +119,7 @@ export default function Note() {
     }
   };
 
-  const cancelUpdateNote = () => {
+  const cancelUpdateNote = (id: string) => {
     setIsUpdating(false);
     setEmptyFields([]);
     setError("");
@@ -177,81 +169,18 @@ export default function Note() {
     else getLocalNote();
   }, [user, dispatch, id]);
 
-  return (
-    <Section>
-      <Form className={error && "animate-shake"} onSubmit={updateNote}>
-        <div className="w-full max-w-[90%] h-max">
-          <div
-            onClick={() => setIsUpdating(true)}
-            className="w-full flex flex-col cursor-text"
-          >
-            {isUpdating ? (
-              <textarea
-                name="title"
-                id="update-title"
-                className={`${emptyFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
-                placeholder="Title"
-                value={noteData.title}
-                onChange={handleUpdateChange}
-                onKeyDown={(event) => handleKeyDown(event, updateNote)}
-              />
-            ) : (
-              <h5 className="whitespace-normal pl-2 text-primary">
-                {noteData.title}
-              </h5>
-            )}
-            <NoteDate
-              className="mt-1 mb-10 ml-2"
-              createdAt={noteData.createdAt}
-              updatedAt={noteData.updatedAt}
-            />
-            <div className=""></div>
-            {isUpdating ? (
-              <textarea
-                name="content"
-                id="update-content"
-                className={`${emptyFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
-                placeholder="Content"
-                value={noteData.content}
-                onChange={handleUpdateChange}
-                onKeyDown={(event) => handleKeyDown(event, updateNote)}
-              />
-            ) : (
-              <div className="whitespace-pre-line pl-2">{noteData.content}</div>
-            )}
-          </div>
-          <AoNoteError error={error} className="w-max" />
-        </div>
-        <div className="flex flex-col-reverse items-center justify-between gap-5">
-          <div className="flex xl:flex-col">
-            <button
-              type="button"
-              onClick={() => {
-                deleteNote(noteData._id, dispatch);
-                navigate("/");
-              }}
-              className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
-            >
-              <FaTrash />
-            </button>
-            <button
-              type="submit"
-              className="rounded-full p-4 hover:bg-primary cursor-pointer hover:text-white transition-colors"
-            >
-              {isUpdating ? <FaCheck /> : <FaPencil />}
-            </button>
-            {isUpdating && (
-              <button
-                onClick={cancelUpdateNote}
-                className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
-              >
-                <FaXmark />
-              </button>
-            )}
-          </div>
-          <BackBtn />
-        </div>
-      </Form>
-    </Section>
-  );
-}
+  return {
+    noteData,
+    setNoteData,
+    dispatch,
+    navigate,
+    error,
+    emptyFields,
+    isUpdating,
+    setIsUpdating,
+    deleteNote,
+    handleUpdateChange,
+    updateNote,
+    cancelUpdateNote,
+  };
+};
