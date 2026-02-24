@@ -3,6 +3,11 @@ feature:
   - feature/*
   - feat/*
 
+enhancement:
+- head-branch:
+  - impr/*
+  - improvement/*
+
 fix:
 - head-branch: fix/*
 
@@ -43,4 +48,5 @@ dependencies:
 - changed-files:
 
   - any-glob-to-any-file: 'pnpm-lock.yaml'
+
 
