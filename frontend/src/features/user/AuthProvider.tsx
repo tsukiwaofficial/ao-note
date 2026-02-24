@@ -3,7 +3,7 @@ import type { UserAuthAction, UserAuth } from "./user.types";
 import { AuthContext } from "./AuthContext";
 import { refreshAccessToken } from "./refresh-token.util";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
-import { decodeGuestToken } from "./user-guest-token.util";
+import { createGuestToken, decodeGuestToken } from "./user-guest-token.util";
 import { guestToken } from "./user.config";
 
 const authReducer = (prevState: UserAuth, action: UserAuthAction): UserAuth => {
@@ -26,6 +26,7 @@ export default function AuthProvider({
 
   useEffect(() => {
     const initializeAuth = async () => {
+      createGuestToken();
       const token = localStorage.getItem(guestToken);
 
       if (!state.token) {
