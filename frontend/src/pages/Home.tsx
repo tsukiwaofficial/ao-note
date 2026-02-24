@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Note } from "../features/notes/note.types";
-import NoteDetails from "../features/notes/NoteDetails";
+import NoteCard from "../features/notes/NoteCard";
 import { useNoteContext } from "../features/notes/useNoteContext";
 import Banner from "../components/Banner";
 import Section from "../layouts/Section";
@@ -72,7 +72,7 @@ export default function Home() {
             ) : notes.length > 0 ? (
               notes.map(
                 ({ _id, title, content, createdAt, updatedAt }: Note) => (
-                  <NoteDetails
+                  <NoteCard
                     key={_id}
                     _id={_id}
                     title={title}

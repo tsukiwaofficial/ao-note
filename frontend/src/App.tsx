@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // pages
 import Home from "./pages/Home";
-import Note from "./features/notes/[Note]";
-import NoteForm from "./features/notes/NoteForm";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import AddNote from "./pages/AddNote";
+import NoteDetails from "./pages/[NoteDetails]";
 
 // providers
 import NoteProvider from "./features/notes/NoteProvider";
@@ -24,8 +24,8 @@ const App = () => {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/:id" element={<Note />} />
-            <Route path="/add-note" element={<NoteForm />} />
+            <Route path="/:id" element={<NoteDetails />} />
+            <Route path="/add-note" element={<AddNote />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Routes>
