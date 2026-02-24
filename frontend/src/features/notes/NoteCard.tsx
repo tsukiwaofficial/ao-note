@@ -7,7 +7,7 @@ import { Button } from "../../components/ui/Button";
 import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
 import { useDeleteNote } from "./useDeleteNote";
 
-export default function NoteDetails({
+export default function NoteCard({
   _id,
   title,
   content,
