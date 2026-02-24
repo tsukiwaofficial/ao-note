@@ -14,6 +14,8 @@ import { useAuthContext } from "../user/useAuthContext";
 import { guestNotes } from "../user/user.config";
 import { useDeleteNote } from "./useDeleteNote";
 import { putOptions } from "../../shared/utils/http/fetch-options.utils";
+import AoNoteError from "../../components/AoNoteError";
+import { formChecker } from "../../shared/utils/form-checker.util";
 
 export default function Note() {
   const { id } = useParams();
@@ -36,6 +38,28 @@ export default function Note() {
   const updateNote = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     setIsUpdating(true);
+
+    const emptyKeys = formChecker<Note>(noteData);
+
+    if (emptyKeys.length > 0) {
+      setEmptyFields(emptyKeys);
+      switch (true) {
+        case emptyKeys.includes("title") && emptyKeys.includes("content"):
+          setError("You can't update a note to being empty.");
+          break;
+        case emptyKeys.includes("title"):
+          setError("Title can't be empty.");
+          break;
+        case emptyKeys.includes("content"):
+          setError("Content can't be empty.");
+          break;
+      }
+
+      await timer(3);
+      setError("");
+
+      return;
+    }
 
     if (isUpdating) {
       const payload = {
@@ -154,9 +178,9 @@ export default function Note() {
   }, [user, dispatch, id]);
 
   return (
-    <Section className="px-[5vw]">
+    <Section>
       <Form className={error && "animate-shake"} onSubmit={updateNote}>
-        <div className="w-full h-max">
+        <div className="w-full max-w-[90%] h-max">
           <div
             onClick={() => setIsUpdating(true)}
             className="w-full flex flex-col cursor-text"
@@ -165,7 +189,7 @@ export default function Note() {
               <textarea
                 name="title"
                 id="update-title"
-                className={`${emptyFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content resize-none text-3xl font-bold text-primary transition-colors`}
+                className={`${emptyFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
                 placeholder="Title"
                 value={noteData.title}
                 onChange={handleUpdateChange}
@@ -186,7 +210,7 @@ export default function Note() {
               <textarea
                 name="content"
                 id="update-content"
-                className={`${emptyFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content min-h-15 resize-none`}
+                className={`${emptyFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
                 placeholder="Content"
                 value={noteData.content}
                 onChange={handleUpdateChange}
@@ -196,13 +220,9 @@ export default function Note() {
               <div className="whitespace-pre-line pl-2">{noteData.content}</div>
             )}
           </div>
-          <div
-            className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max mt-30 transition-[opacity_height]`}
-          >
-            {error}
-          </div>
+          <AoNoteError error={error} className="w-max" />
         </div>
-        <div className="flex flex-col xl:flex-row items-start justify-between gap-5">
+        <div className="flex flex-col-reverse items-center justify-between gap-5">
           <div className="flex xl:flex-col">
             <button
               type="button"

@@ -15,20 +15,22 @@ import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { useAuthContext } from "../user/useAuthContext";
 import { guestNotes } from "../user/user.config";
 import { v4 as uuidv4 } from "uuid";
+import { formChecker } from "../../shared/utils/form-checker.util";
+import AoNoteError from "../../components/AoNoteError";
 
 const { title: titlePlaceholder, content: contentPlaceholder } =
   getPlaceholder(notePlaceholders);
 
 export default function NoteForm() {
+  const navigate = useNavigate();
+  const { dispatch } = useNoteContext();
+  const { state: user } = useAuthContext();
   const [noteData, setNoteData] = useState<Note>({
     title: "",
     content: "",
   });
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
-  const { dispatch } = useNoteContext();
-  const navigate = useNavigate();
-  const { state: user } = useAuthContext();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -39,6 +41,28 @@ export default function NoteForm() {
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
+
+    const emptyKeys = formChecker<Note>(noteData);
+
+    if (emptyKeys.length > 0) {
+      setEmptyFields(emptyKeys);
+      switch (true) {
+        case emptyKeys.includes("title") && emptyKeys.includes("content"):
+          setError("You can't submit an empty note.");
+          break;
+        case emptyKeys.includes("title"):
+          setError("Title can't be empty.");
+          break;
+        case emptyKeys.includes("content"):
+          setError("Content can't be empty.");
+          break;
+      }
+
+      await timer(3);
+      setError("");
+
+      return;
+    }
 
     const payload = {
       title: noteData.title.trim(),
@@ -97,19 +121,19 @@ export default function NoteForm() {
   };
 
   return (
-    <Section className="px-[5vw]">
+    <Section>
       {/* <img
         src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaDV0ZGtxbms5bXg1aGY2OXNwM3NrdG4zMmU5djZrMjhsemUxOG92eCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/boOoHL2PAFXahZyObR/giphy.gif"
         alt=""
         className="absolute max-w-70 -top-45 -right-20"
       /> */}
       <Form className={error && "animate-shake"} onSubmit={handleSubmit}>
-        <div className="w-full h-max">
-          <div className="w-full flex flex-col gap-11 cursor-text">
+        <div className="w-full max-w-[90%] h-max">
+          <div className="flex flex-col gap-11 cursor-text">
             <textarea
               name="title"
               id="title"
-              className={`${emptyFields.includes("title") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content resize-none text-3xl font-bold text-primary transition-colors`}
+              className={`${emptyFields.includes("title") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
               placeholder={`Type here the title of your note. For example, ${titlePlaceholder}`}
               value={noteData.title}
               onChange={handleInputChange}
@@ -119,20 +143,16 @@ export default function NoteForm() {
             <textarea
               name="content"
               id="content"
-              className={`${emptyFields.includes("content") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent field-sizing-content min-h-15 resize-none`}
+              className={`${emptyFields.includes("content") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15`}
               placeholder={contentPlaceholder}
               value={noteData.content}
               onChange={handleInputChange}
               onKeyDown={(event) => handleKeyDown(event, handleSubmit)}
             />
           </div>
-          <div
-            className={`${error ? "opacity-100 rounded-lg text-error p-4 border-2 border-error bg-error/30 mb-4 h-max" : "h-0"} w-max mt-30 transition-[opacity_height]`}
-          >
-            {error}
-          </div>
+          <AoNoteError error={error} className="w-max" />
         </div>
-        <div className="flex xl:flex-col gap-5">
+        <div className="w-max flex xl:flex-col gap-5">
           <BackBtn />
           <Button type="submit" variant="cta" className="">
             Add
