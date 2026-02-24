@@ -8,7 +8,7 @@ import { FaUser } from "react-icons/fa";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa6";
 import { Button } from "../components/ui/Button";
 import AuthBanner from "../components/AuthBanner";
-import Error from "../components/Error";
+import AoNoteError from "../components/AoNoteError";
 
 export default function Login() {
   const { userData, setUserData, error, errorFields, isLoading, login } =
@@ -91,7 +91,7 @@ export default function Login() {
                   </span>
                 </div>
               </div>
-              <Error error={error} />
+              <AoNoteError error={error} />
             </div>
             <Button
               type="submit"

@@ -7,7 +7,7 @@ import { useUserSignup } from "../features/user/useUserSignup";
 import { useAuthContext } from "../features/user/useAuthContext";
 import { useState } from "react";
 import AuthBanner from "../components/AuthBanner";
-import Error from "../components/Error";
+import AoNoteError from "../components/AoNoteError";
 
 export default function Signup() {
   const { userData, setUserData, error, errorFields, isLoading, signup } =
@@ -117,7 +117,7 @@ export default function Signup() {
                   </span>
                 </span>
               </div>
-              <Error error={error} />
+              <AoNoteError error={error} />
             </div>
             <Button
               type="submit"
