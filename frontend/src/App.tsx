@@ -15,23 +15,26 @@ import AuthProvider from "./features/user/AuthProvider";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import BreakpointIndicator from "./components/BreakpointIndicator";
+import { CookiesProvider } from "react-cookie";
 
 const App = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <NoteProvider>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/:id" element={<NoteDetails />} />
-            <Route path="/add-note" element={<AddNote />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Routes>
-        </NoteProvider>
-        <Footer />
-      </AuthProvider>
+      <CookiesProvider>
+        <AuthProvider>
+          <NoteProvider>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/:id" element={<NoteDetails />} />
+              <Route path="/add-note" element={<AddNote />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Routes>
+          </NoteProvider>
+          <Footer />
+        </AuthProvider>
+      </CookiesProvider>
       <BreakpointIndicator />
     </BrowserRouter>
   );
