@@ -6,6 +6,7 @@ import { AoNoteError } from "../../shared/lib/error";
 import { createTokens } from "./create-tokens.util";
 import { ACCESS_SECRET, REFRESH_SECRET } from "../../shared/config/env.config";
 import { cookieOptions } from "../../shared/lib/cookie";
+import { SEVEN_DAYS_EXPIRY } from "../../shared/config/expiries.config";
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
@@ -54,7 +55,13 @@ export const login = async (req: { body: User }, res: Response) => {
     res.cookie(
       "refreshToken",
       refreshToken,
-      cookieOptions(7 * 24 * 60 * 60 * 1000),
+      cookieOptions("token", SEVEN_DAYS_EXPIRY),
+    );
+
+    res.cookie(
+      "isLoggedIn",
+      "true",
+      cookieOptions("status", SEVEN_DAYS_EXPIRY),
     );
 
     res.status(200).json({
@@ -70,7 +77,8 @@ export const login = async (req: { body: User }, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  res.clearCookie("refreshToken", cookieOptions(7 * 24 * 60 * 60 * 1000));
+  res.clearCookie("refreshToken");
+  res.clearCookie("isLoggedIn");
 
   res.status(200).json({ message: "Logged out successfully." });
 };
@@ -93,7 +101,13 @@ export const signup = async (req: { body: User }, res: Response) => {
     res.cookie(
       "refreshToken",
       refreshToken,
-      cookieOptions(7 * 24 * 60 * 60 * 1000),
+      cookieOptions("token", SEVEN_DAYS_EXPIRY),
+    );
+
+    res.cookie(
+      "isLoggedIn",
+      "true",
+      cookieOptions("status", SEVEN_DAYS_EXPIRY),
     );
 
     res.status(201).json({

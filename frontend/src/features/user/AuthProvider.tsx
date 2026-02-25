@@ -1,10 +1,11 @@
 import { useEffect, useReducer } from "react";
 import type { UserAuthAction, UserAuth } from "./user.types";
 import { AuthContext } from "./AuthContext";
-import { refreshAccessToken } from "./refresh-token.util";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
 import { createGuestToken, decodeGuestToken } from "./user-guest-token.util";
 import { guestToken } from "./user.config";
+import { useRefreshAccessToken } from "./useRefreshAccessToken";
+import { useCookies } from "react-cookie";
 
 const authReducer = (prevState: UserAuth, action: UserAuthAction): UserAuth => {
   switch (action.type) {
@@ -23,29 +24,30 @@ export default function AuthProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(authReducer, {} as UserAuth);
+  const { refreshAccessToken } = useRefreshAccessToken();
+  const [cookies] = useCookies(["isLoggedIn"]);
 
   useEffect(() => {
     const initializeAuth = async () => {
-      createGuestToken();
-      const token = localStorage.getItem(guestToken);
-
       if (!state.token) {
-        if (token) {
-          const decoded = decodeGuestToken(token);
-          dispatch({
-            type: "LOGIN",
-            payload: { role: decoded.role, token: decoded.token },
-          });
-
-          return;
+        if (cookies.isLoggedIn) {
+          const user = await refreshAccessToken();
+          if (user)
+            dispatch({
+              type: "LOGIN",
+              payload: { role: user.role, token: user.token },
+            });
+        } else {
+          createGuestToken();
+          const isGuestTokenExists = localStorage.getItem(guestToken);
+          if (isGuestTokenExists) {
+            const decoded = decodeGuestToken(isGuestTokenExists);
+            dispatch({
+              type: "LOGIN",
+              payload: { role: decoded.role, token: decoded.token },
+            });
+          }
         }
-
-        const user = await refreshAccessToken();
-        if (user)
-          dispatch({
-            type: "LOGIN",
-            payload: { role: user.role, token: user.token },
-          });
       }
     };
 
