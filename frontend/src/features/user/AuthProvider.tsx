@@ -3,7 +3,7 @@ import type { UserAuthAction, UserAuth } from "./user.types";
 import { AuthContext } from "./AuthContext";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
 import { createGuestToken, decodeGuestToken } from "./user-guest-token.util";
-import { guestToken } from "./user.config";
+import { BUFFER, DEFAULT_TOKEN_EXPIRY, guestToken } from "./user.config";
 import { useRefreshAccessToken } from "./useRefreshAccessToken";
 import { useCookies } from "react-cookie";
 
@@ -56,31 +56,29 @@ export default function AuthProvider({
   }, []);
 
   useEffect(() => {
-    const verifyUser = async () => {
-      if (state.token && state.role === "user") {
-        const { exp } = jwtDecode<JwtPayload>(state.token);
+    if (state.token && cookies.isLoggedIn) {
+      const { exp } = jwtDecode<JwtPayload>(state.token);
 
-        const refreshTime = exp! * 1000 - Date.now() - 60000;
+      const refreshTime = exp
+        ? exp * 1000 - Date.now() - BUFFER
+        : DEFAULT_TOKEN_EXPIRY - BUFFER;
 
-        const timer = setTimeout(async () => {
-          const newToken = await refreshAccessToken();
+      const timer = setTimeout(async () => {
+        if (!cookies.isLoggedIn) return;
 
-          if (newToken) {
-            dispatch({
-              type: "LOGIN",
-              payload: { ...state, token: newToken.token },
-            });
-          }
-        }, refreshTime);
+        const newToken = await refreshAccessToken();
 
-        return () => clearTimeout(timer);
-      } else return;
-    };
+        if (newToken) {
+          dispatch({
+            type: "LOGIN",
+            payload: { ...state, token: newToken.token },
+          });
+        }
+      }, refreshTime);
 
-    verifyUser();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.token]);
+      return () => clearTimeout(timer);
+    }
+  }, [state.token, cookies.isLoggedIn]);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
