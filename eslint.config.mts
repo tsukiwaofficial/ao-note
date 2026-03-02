@@ -15,10 +15,11 @@ export default defineConfig(
   {
     ignores: ["node_modules", "build", "dist", "public"],
   },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   [
     {
       files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-      extends: [js.configs.recommended, ...tseslint.configs.recommended],
       languageOptions: {
         ecmaVersion: 2020,
         globals: { ...globals.browser, ...globals.node },
@@ -32,7 +33,7 @@ export default defineConfig(
         "react-refresh": reactRefresh,
       },
       rules: {
-        ...reactHooks.configs["recommended-latest"].rules,
+        ...reactHooks.configs.recommended.rules,
         "react-refresh/only-export-components": [
           "warn",
           { allowConstantExport: true },
@@ -45,5 +46,5 @@ export default defineConfig(
         },
       },
     },
-  ]
+  ],
 );
