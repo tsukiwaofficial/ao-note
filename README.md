@@ -18,5 +18,5 @@ See [`contributing.md`](https://github.com/tsukiwaofficial/ao-note/blob/main/doc
 
 ## License
 
-[MIT](https://github.com/tsukiwaofficial/ao-note/blob/main/docs/LICENSE)
+[MIT](https://github.com/tsukiwaofficial/ao-note/blob/main/LICENSE)
 
