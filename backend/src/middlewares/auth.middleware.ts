@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { ACCESS_SECRET } from "../shared/config/env.config";
-import { UserModel } from "../features/user/user.model";
+import { UserModel } from "../features/user/user.models";
 
 export const authMiddleware = async (
   req: Request,
