@@ -62,7 +62,7 @@ export const useUserSignup = () => {
       password,
     };
 
-    const response = await aoNoteFetch("/api/user/signup", {
+    const response = await aoNoteFetch("/api/users/signup", {
       ...postOptions<User>(payload),
     });
 
@@ -81,7 +81,11 @@ export const useUserSignup = () => {
 
     dispatch({
       type: "LOGIN",
-      payload: { role: jwtDecoder(result.token).role, token: result.token },
+      payload: {
+        _id: jwtDecoder(result.token)._id,
+        role: jwtDecoder(result.token).role,
+        token: result.token,
+      },
     });
     localStorage.removeItem(guestToken);
     setIsLoading(false);

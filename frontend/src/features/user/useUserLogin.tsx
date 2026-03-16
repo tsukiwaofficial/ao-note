@@ -46,7 +46,7 @@ export const useUserLogin = () => {
       password,
     };
 
-    const response = await aoNoteFetch("/api/user/login", {
+    const response = await aoNoteFetch("/api/users/login", {
       ...postOptions<User>(payload),
     });
 
@@ -65,7 +65,11 @@ export const useUserLogin = () => {
 
     dispatch({
       type: "LOGIN",
-      payload: { role: jwtDecoder(result.token).role, token: result.token },
+      payload: {
+        _id: jwtDecoder(result.token)._id,
+        role: jwtDecoder(result.token).role,
+        token: result.token,
+      },
     });
     localStorage.removeItem(guestToken);
     setIsLoading(false);
