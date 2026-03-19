@@ -171,6 +171,8 @@ export const updateAvatar = async (
     if (!Types.ObjectId.isValid(id))
       return res.status(404).json({ message: "Invalid user ID" });
 
+    if (!avatar) return res.status(400).json({ message: "Avatar is empty." });
+
     if (id === userId.toString()) {
       const userDetails = await UserDetailsModel.findOneAndUpdate(
         { userId },
@@ -209,6 +211,9 @@ export const updateDisplayName = async (
     if (!id) return res.status(400).json({ message: "User ID is required" });
     if (!Types.ObjectId.isValid(id))
       return res.status(404).json({ message: "Invalid user ID" });
+
+    if (!displayName)
+      return res.status(400).json({ message: "Display name is empty." });
 
     if (id === userId.toString()) {
       const userDetails = await UserDetailsModel.findOneAndUpdate(
