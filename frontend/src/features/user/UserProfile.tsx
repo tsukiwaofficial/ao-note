@@ -130,14 +130,16 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
             <LoadingSpinner className="w-50" />
           )}
         </div>
-        <span className="text-sm mt-5 text-right">
-          {formatDate(
-            new Date(
-              userDetails.createdAt ? userDetails.createdAt : Date.now(),
-            ),
-            "LL-dd-yyyy",
-          )}
-        </span>
+        {role === "user" && (
+          <span className="text-sm mt-5 text-right">
+            {formatDate(
+              new Date(
+                userDetails.createdAt ? userDetails.createdAt : Date.now(),
+              ),
+              "LL-dd-yyyy",
+            )}
+          </span>
+        )}
         {role === "guest" && (
           <div className="mt-10 mx-auto">
             <Link
