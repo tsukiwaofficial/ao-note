@@ -1,24 +1,20 @@
 import type { Dispatch } from "react";
 import type { JwtPayload } from "jwt-decode";
+import type { MongoDbDefaults } from "../../shared/types/mongodb.types";
 
-export interface User {
-  _id?: string;
+export interface User extends MongoDbDefaults {
   username: string;
   password: string;
 }
 
 export type ConfirmUser = User & { confirmPassword: string };
 
-export interface UserDetails {
-  _id?: string;
+export interface UserDetails extends MongoDbDefaults {
   avatar: string;
   displayName: string;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
 }
 
-export interface UserAuth {
-  _id: string;
+export interface UserAuth extends MongoDbDefaults {
   role: string;
   token: string;
 }
