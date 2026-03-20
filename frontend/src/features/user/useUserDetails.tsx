@@ -24,7 +24,8 @@ export const useUserDetails = () => {
     setUserAvatarData(value);
     setEmptyField("");
 
-    await timer(1);
+    if (!value) return;
+
     const isImageVerified = await checkImageAddress(value);
 
     if (isImageVerified) return;

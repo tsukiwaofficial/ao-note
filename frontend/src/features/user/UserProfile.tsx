@@ -172,7 +172,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
           <img
             src={userAvatarData ? userAvatarData : defaultAvatar}
             alt="avatar"
-            className="object-cover w-80 aspect-square rounded-full"
+            className={`object-cover w-80 aspect-square rounded-full border-2 ${error ? "border-error animate-shake" : "border-transparent"} transition-colors`}
           />
         </div>
         <div className="h-full flex flex-col">
@@ -190,6 +190,9 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
               />
             </div>
             <span className="flex w-max gap-3 ml-auto">
+              <Button variant="cta" type="button">
+                Preview
+              </Button>
               <Button
                 variant="outline"
                 className="hover:bg-primary border-primary text-primary"
