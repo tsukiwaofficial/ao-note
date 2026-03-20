@@ -1,12 +1,14 @@
 import type { HTMLAttributes } from "react";
-import { FaSpinner } from "react-icons/fa6";
+import KuruKuru from "../assets/images/kurukuru.png";
 
 type LoadingSpinnerProps = HTMLAttributes<HTMLDivElement>;
 
 export default function LoadingSpinner({ className }: LoadingSpinnerProps) {
   return (
-    <div className={`text-primary ${className}`}>
-      <FaSpinner className="animate-spin" />
+    <div
+      className={`pointer-events-none text-primary rounded-full max-w-50 overflow-hidden ${className}`}
+    >
+      <img src={KuruKuru} alt="herta" className="object-cover w-full h-full" />
     </div>
   );
 }
