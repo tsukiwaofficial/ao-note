@@ -7,6 +7,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import AoNoteError from "../../components/AoNoteError";
 import { Link } from "react-router-dom";
 import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
+import { formatDate } from "date-fns";
 
 export default function UserProfile({ role }: { role: "user" | "guest" }) {
   const { state: userDetails } = useUserContext();
@@ -129,6 +130,14 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
             <LoadingSpinner className="w-50" />
           )}
         </div>
+        <span className="text-sm mt-5 text-right">
+          {formatDate(
+            new Date(
+              userDetails.createdAt ? userDetails.createdAt : Date.now(),
+            ),
+            "LL-dd-yyyy",
+          )}
+        </span>
         {role === "guest" && (
           <div className="mt-10 mx-auto">
             <Link
@@ -161,7 +170,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
         <div className="space-y-2">
           <h6 className="text-center">New</h6>
           <img
-            src={userAvatarData}
+            src={userAvatarData ? userAvatarData : defaultAvatar}
             alt="avatar"
             className="object-cover w-80 aspect-square rounded-full"
           />
