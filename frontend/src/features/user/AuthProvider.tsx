@@ -35,7 +35,7 @@ export default function AuthProvider({
           if (user)
             dispatch({
               type: "LOGIN",
-              payload: { role: user.role, token: user.token },
+              payload: { _id: user._id, role: user.role, token: user.token },
             });
         } else {
           createGuestToken();
@@ -44,7 +44,11 @@ export default function AuthProvider({
             const decoded = decodeGuestToken(isGuestTokenExists);
             dispatch({
               type: "LOGIN",
-              payload: { role: decoded.role, token: decoded.token },
+              payload: {
+                _id: decoded.token,
+                role: decoded.role,
+                token: decoded.token,
+              },
             });
           }
         }
@@ -78,6 +82,7 @@ export default function AuthProvider({
 
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.token, cookies.isLoggedIn]);
 
   return (

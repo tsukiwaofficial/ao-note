@@ -2,7 +2,7 @@ import type { Model } from "mongoose";
 import bcrypt from "bcrypt";
 import type { User, UserDocument } from "./user.types";
 import validator from "validator";
-import { RESERVED_USERNAMES_SET } from "../../shared/config/usernames.config";
+import { RESERVED_USERNAMES_SET } from "./usernames.config";
 import { AoNoteError } from "../../shared/lib/error";
 
 export const userStatics = {

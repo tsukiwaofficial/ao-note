@@ -4,12 +4,16 @@ import { Button } from "../components/ui/Button";
 import { useUserLogout } from "../features/user/useUserLogout";
 import { buttonVariants } from "../shared/config/ui-variants/button-variants.config";
 import { MdLogout } from "react-icons/md";
+import { useUserContext } from "../features/user/useUserContext";
+import { defaultAvatar } from "../features/user/user.config";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const authRoutes = ["/login", "/signup"];
 
 export default function Header() {
   const location = useLocation();
-  const { state: user } = useAuthContext();
+  const { state: userAuth } = useAuthContext();
+  const { state: userDetails } = useUserContext();
   const { logout } = useUserLogout();
 
   return (
@@ -20,8 +24,29 @@ export default function Header() {
           <h5>Ao Note</h5>
         </Link>
         <nav className="flex gap-10 items-center">
-          <h6 className="max-w-100 truncate capitalize">{user.role}</h6>
-          {user.role === "user" && (
+          <Link
+            to={`users/${userAuth.role === "user" ? userAuth._id : userAuth.role}`}
+            className="flex items-center gap-2 group"
+          >
+            {Object.keys(userDetails).length > 0 ||
+            userAuth.role === "guest" ? (
+              <img
+                src={
+                  userAuth.role === "user" ? userDetails.avatar : defaultAvatar
+                }
+                alt="avatar"
+                className="object-cover rounded-full max-w-10 aspect-square group-hover:scale-110 transition-transform"
+              />
+            ) : (
+              <LoadingSpinner className="w-15" />
+            )}
+            <span className="font-semibold group-hover:text-primary transition-colors">
+              {userAuth.role === "user"
+                ? userDetails.displayName
+                : userAuth.role}
+            </span>
+          </Link>
+          {userAuth.role === "user" && (
             <Button
               onClick={logout}
               variant="icon"
@@ -31,7 +56,7 @@ export default function Header() {
             </Button>
           )}
           <div className="space-x-3">
-            {user.role === "guest" &&
+            {userAuth.role === "guest" &&
               !authRoutes.includes(location.pathname) && (
                 <>
                   <Link

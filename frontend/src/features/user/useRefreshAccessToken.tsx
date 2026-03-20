@@ -5,7 +5,7 @@ import type { UserAuth } from "./user.types";
 export const useRefreshAccessToken = () => {
   const refreshAccessToken = async (): Promise<UserAuth | null> => {
     try {
-      const response = await aoNoteFetch("/api/user/refresh", {
+      const response = await aoNoteFetch("/api/users/refresh", {
         method: "POST",
       });
 
@@ -14,7 +14,11 @@ export const useRefreshAccessToken = () => {
 
       const data = await response.json();
 
-      return { role: jwtDecoder(data.token).role, token: data.token };
+      return {
+        _id: jwtDecoder(data.token)._id,
+        role: jwtDecoder(data.token).role,
+        token: data.token,
+      };
     } catch (error) {
       console.error(error);
       return null;

@@ -1,4 +1,4 @@
-import type { Document, Model } from "mongoose";
+import type { Document, Model, Types } from "mongoose";
 
 export interface User {
   username: string;
@@ -16,4 +16,13 @@ export interface UserDocumentModel extends Model<UserDocument> {
     this: Model<UserDocument>,
     { username, password }: User,
   ) => Promise<UserDocument>;
+}
+
+export interface UserDetails {
+  avatar: string;
+  displayName: string;
+}
+
+export interface UserDetailsDocument extends UserDetails, Document {
+  userId: Types.ObjectId;
 }

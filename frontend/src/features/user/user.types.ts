@@ -1,25 +1,25 @@
 import type { Dispatch } from "react";
-import type { Note } from "../notes/note.types";
 import type { JwtPayload } from "jwt-decode";
+import type { MongoDbDefaults } from "../../shared/types/mongodb.types";
 
-export interface User {
-  _id?: string;
-  avatar?: string;
+export interface User extends MongoDbDefaults {
   username: string;
   password: string;
-  notes?: Note[];
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
 }
 
 export type ConfirmUser = User & { confirmPassword: string };
 
-export interface UserAuth {
+export interface UserDetails extends MongoDbDefaults {
+  avatar: string;
+  displayName: string;
+}
+
+export interface UserAuth extends MongoDbDefaults {
   role: string;
   token: string;
 }
 
-export type AoNoteJwtPayload = JwtPayload & { role: string };
+export type AoNoteJwtPayload = JwtPayload & { _id: string; role: string };
 
 export type UserAuthAction =
   | { type: "LOGIN"; payload: UserAuth }
@@ -30,4 +30,12 @@ export interface UserAuthContextAction {
   dispatch: Dispatch<UserAuthAction>;
 }
 
-export type Guest = User;
+export type UserAction =
+  | { type: "GET_USER"; payload: UserDetails }
+  | { type: "UPDATE_AVATAR"; payload: string }
+  | { type: "UPDATE_DISPLAY_NAME"; payload: string };
+
+export interface UserContextAction {
+  state: UserDetails;
+  dispatch: Dispatch<UserAction>;
+}
