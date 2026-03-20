@@ -7,6 +7,8 @@ export default function NoteDetails() {
   const { id } = useParams();
 
   return (
-    <Section>{id ? <NoteDetailsForm id={id} /> : <LoadingSpinner />}</Section>
+    <Section>
+      {id ? <NoteDetailsForm id={id} /> : <LoadingSpinner className="w-40" />}
+    </Section>
   );
 }
