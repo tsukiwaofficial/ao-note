@@ -19,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     const getNotes = async () => {
       setIsLoading(true);
-      const response = await aoNoteFetch("/notes", {
+      const response = await aoNoteFetch("/api/notes", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

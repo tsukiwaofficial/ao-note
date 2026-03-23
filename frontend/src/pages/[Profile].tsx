@@ -13,7 +13,7 @@ export default function Profile() {
 
   useEffect(() => {
     const getNotes = async () => {
-      const response = await aoNoteFetch("/notes", {
+      const response = await aoNoteFetch("/api/notes", {
         headers: {
           Authorization: `Bearer ${userAuth.token}`,
         },

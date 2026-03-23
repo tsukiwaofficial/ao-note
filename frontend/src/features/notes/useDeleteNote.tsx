@@ -14,7 +14,7 @@ export const useDeleteNote = () => {
       throw new Error("ID is missing for this note to be able to be deleted.");
 
     if (user.role === "user") {
-      const response = await aoNoteFetch(`/notes/${_id}`, {
+      const response = await aoNoteFetch(`/api/notes/${_id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user.token}`,
