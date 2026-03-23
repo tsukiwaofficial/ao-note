@@ -68,7 +68,7 @@ export default function Home() {
           </Link>
           <div className="h-max grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
             {loading ? (
-              <LoadingSpinner className="mx-auto my-20 text-5xl" />
+              <LoadingSpinner className="mx-auto my-20" />
             ) : notes.length > 0 ? (
               notes.map(
                 ({ _id, title, content, createdAt, updatedAt }: Note) => (

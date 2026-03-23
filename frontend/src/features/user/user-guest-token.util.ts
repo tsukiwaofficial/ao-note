@@ -21,5 +21,5 @@ export const decodeGuestToken = (token: string): UserAuth => {
   const parts = token.split(".");
   const role = parts[0];
 
-  return { role: role, token: token };
+  return { _id: token, role: role, token: token };
 };
