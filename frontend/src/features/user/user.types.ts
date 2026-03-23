@@ -14,7 +14,8 @@ export interface UserDetails extends MongoDbDefaults {
   displayName: string;
 }
 
-export interface UserAuth extends MongoDbDefaults {
+export interface UserAuth {
+  _id: string;
   role: string;
   token: string;
 }
