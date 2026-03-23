@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import NoteModel from "./note.model";
-import mongoose from "mongoose";
 import type { Note } from "./note.types";
+import { Types } from "mongoose";
 
 export const getNotes = async (req: Request, res: Response) => {
   const { _id: userId } = req.user;
@@ -24,7 +24,7 @@ export const getNote = async (
   const { _id: userId } = req.user;
 
   if (!id) return res.status(400).json({ message: "Note ID is required" });
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!Types.ObjectId.isValid(id))
     return res.status(404).json({ message: "Invalid note ID" });
 
   const result = await NoteModel.findById({ _id: id }).where({ userId });
@@ -71,7 +71,7 @@ export const deleteNote = async (
   const { _id: userId } = req.user;
 
   if (!id) return res.status(400).json({ message: "Note ID is required" });
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!Types.ObjectId.isValid(id))
     return res.status(404).json({ message: "Invalid note ID" });
 
   const result = await NoteModel.findByIdAndDelete({ _id: id }).where({
@@ -103,7 +103,7 @@ export const updateNote = async (
   }
 
   if (!id) return res.status(400).json({ message: "Note ID is required" });
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!Types.ObjectId.isValid(id))
     return res.status(404).json({ message: "Invalid note ID" });
 
   const result = await NoteModel.findOneAndUpdate({ _id: id }, req.body).where({
