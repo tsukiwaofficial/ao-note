@@ -66,7 +66,7 @@ export const useNoteForm = () => {
     };
 
     if (user.role === "user") {
-      const response = await aoNoteFetch("/notes", {
+      const response = await aoNoteFetch("/api/notes", {
         ...postOptions<Note>(payload),
         headers: {
           Authorization: `Bearer ${user.token}`,

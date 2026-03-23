@@ -66,7 +66,7 @@ export const useNoteDetailsForm = (id: string) => {
       };
 
       if (user.role === "user") {
-        const response = await aoNoteFetch(`/notes/${noteData._id}`, {
+        const response = await aoNoteFetch(`/api/notes/${noteData._id}`, {
           ...putOptions<Note>(payload),
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -136,7 +136,7 @@ export const useNoteDetailsForm = (id: string) => {
 
   useEffect(() => {
     const getNote = async () => {
-      const response = await aoNoteFetch(`/notes/${id}`, {
+      const response = await aoNoteFetch(`/api/notes/${id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

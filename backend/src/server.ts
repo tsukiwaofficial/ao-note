@@ -12,7 +12,7 @@ app.use(corsMiddleware);
 app.use(cookieParser());
 app.use(express.json());
 
-app.use("/notes", NoteRoutes);
+app.use("/api/notes", NoteRoutes);
 app.use("/api/users", UserRoutes);
 
 export default app;
