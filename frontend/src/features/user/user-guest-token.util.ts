@@ -19,7 +19,7 @@ export const createGuestToken = () => {
 
 export const decodeGuestToken = (token: string): UserAuth => {
   const parts = token.split(".");
-  const role = parts[0];
+  const id = parts[1];
 
-  return { _id: token, role: role, token: token };
+  return { _id: id, role: "guest", token: token };
 };
