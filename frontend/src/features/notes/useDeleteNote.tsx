@@ -1,10 +1,11 @@
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
-import { useAuthContext } from "../user/useAuthContext";
 import { guestNotes } from "../user/user.config";
+import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
 import type { Note, NoteAction } from "./note.types";
 
 export const useDeleteNote = () => {
-  const { state: user } = useAuthContext();
+  const role = useAuthRole();
+  const token = useAuthToken();
 
   const deleteNote = async (
     _id: string | undefined,
@@ -13,11 +14,11 @@ export const useDeleteNote = () => {
     if (!_id)
       throw new Error("ID is missing for this note to be able to be deleted.");
 
-    if (user.role === "user") {
+    if (role === "user") {
       const response = await aoNoteFetch(`/api/notes/${_id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

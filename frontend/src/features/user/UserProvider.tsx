@@ -1,8 +1,14 @@
 import { useEffect, useReducer } from "react";
 import type { UserAction, UserDetails } from "./user.types";
 import { UserContext } from "./UserContext";
-import { useAuthContext } from "./useAuthContext";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
+import { useCookies } from "react-cookie";
+import {
+  useAuthActions,
+  useAuthId,
+  useAuthRole,
+  useAuthToken,
+} from "./useUserAuthStore";
 
 const userReducer = (
   prevState: UserDetails,
@@ -26,13 +32,26 @@ export default function UserProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(userReducer, {} as UserDetails);
-  const { state: userAuth } = useAuthContext();
+  const [cookies] = useCookies(["isLoggedIn"]);
+  const _id = useAuthId();
+  const role = useAuthRole();
+
+  const token = useAuthToken();
+  const { useInitializeUserAuth, useRefreshUserAuth, useInitializeGuestAuth } =
+    useAuthActions();
+
+  if (cookies.isLoggedIn) useInitializeUserAuth(cookies.isLoggedIn);
+  else useInitializeGuestAuth(cookies.isLoggedIn);
+
+  useEffect(() => {
+    useRefreshUserAuth(token, cookies.isLoggedIn);
+  }, [token]);
 
   useEffect(() => {
     const getUserDetails = async (id: string) => {
       const response = await aoNoteFetch(`/api/users/${id}`, {
         headers: {
-          Authorization: `Bearer ${userAuth.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -43,8 +62,8 @@ export default function UserProvider({
       dispatch({ type: "GET_USER", payload: user });
     };
 
-    if (userAuth.role === "user") getUserDetails(userAuth._id);
-  }, [userAuth]);
+    if (role === "user") getUserDetails(_id);
+  }, [role, _id, token]);
 
   return (
     <UserContext.Provider value={{ state, dispatch }}>

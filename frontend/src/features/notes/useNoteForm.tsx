@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useNoteContext } from "./useNoteContext";
-import { useAuthContext } from "../user/useAuthContext";
 import { useState, type FormEvent } from "react";
 import type { Note } from "./note.types";
 import { formChecker } from "../../shared/utils/form-checker.util";
@@ -9,17 +8,19 @@ import { v4 as uuidv4 } from "uuid";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { postOptions } from "../../shared/utils/http/fetch-options.utils";
 import { guestNotes } from "../user/user.config";
+import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
 
 export const useNoteForm = () => {
   const navigate = useNavigate();
   const { dispatch } = useNoteContext();
-  const { state: user } = useAuthContext();
   const [noteData, setNoteData] = useState<Note>({
     title: "",
     content: "",
   });
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
+  const role = useAuthRole();
+  const token = useAuthToken();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -65,11 +66,11 @@ export const useNoteForm = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    if (user.role === "user") {
+    if (role === "user") {
       const response = await aoNoteFetch("/api/notes", {
         ...postOptions<Note>(payload),
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

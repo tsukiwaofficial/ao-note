@@ -6,22 +6,23 @@ import Banner from "../components/Banner";
 import Section from "../layouts/Section";
 import { FaPlus } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { useAuthContext } from "../features/user/useAuthContext";
 import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
 import { guestNotes } from "../features/user/user.config";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuthRole, useAuthToken } from "../features/user/useUserAuthStore";
 
 export default function Home() {
   const { state: notes, dispatch } = useNoteContext();
-  const { state: user } = useAuthContext();
   const [loading, setIsLoading] = useState<boolean>(false);
+  const role = useAuthRole();
+  const token = useAuthToken();
 
   useEffect(() => {
     const getNotes = async () => {
       setIsLoading(true);
       const response = await aoNoteFetch("/api/notes", {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       const result = await response.json();
@@ -50,9 +51,9 @@ export default function Home() {
       setIsLoading(false);
     };
 
-    if (user.role === "user") getNotes();
-    else if (user.role === "guest") getLocalNotes();
-  }, [user, dispatch]);
+    if (role === "user") getNotes();
+    else if (role === "guest") getLocalNotes();
+  }, [role, dispatch]);
 
   return (
     <Section>

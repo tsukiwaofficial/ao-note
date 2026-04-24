@@ -2,13 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useNoteContext } from "./useNoteContext";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Note } from "./note.types";
-import { useAuthContext } from "../user/useAuthContext";
 import { useDeleteNote } from "./useDeleteNote";
 import { formChecker } from "../../shared/utils/form-checker.util";
 import { timer } from "../../shared/utils/timer.util";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { putOptions } from "../../shared/utils/http/fetch-options.utils";
 import { guestNotes } from "../user/user.config";
+import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
 
 export const useNoteDetailsForm = (id: string) => {
   const navigate = useNavigate();
@@ -17,8 +17,9 @@ export const useNoteDetailsForm = (id: string) => {
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
-  const { state: user } = useAuthContext();
   const { deleteNote } = useDeleteNote();
+  const role = useAuthRole();
+  const token = useAuthToken();
 
   const handleUpdateChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -65,11 +66,11 @@ export const useNoteDetailsForm = (id: string) => {
         updatedAt: new Date().toISOString(),
       };
 
-      if (user.role === "user") {
+      if (role === "user") {
         const response = await aoNoteFetch(`/api/notes/${noteData._id}`, {
           ...putOptions<Note>(payload),
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -138,7 +139,7 @@ export const useNoteDetailsForm = (id: string) => {
     const getNote = async () => {
       const response = await aoNoteFetch(`/api/notes/${id}`, {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -165,9 +166,9 @@ export const useNoteDetailsForm = (id: string) => {
         }
       }
     };
-    if (user.role === "user") getNote();
+    if (role === "user") getNote();
     else getLocalNote();
-  }, [user, dispatch, id]);
+  }, [role, token, dispatch, id]);
 
   return {
     noteData,

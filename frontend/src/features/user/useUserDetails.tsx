@@ -2,9 +2,9 @@ import { useState } from "react";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { timer } from "../../shared/utils/timer.util";
 import { useUserContext } from "./useUserContext";
-import { useAuthContext } from "./useAuthContext";
 import { putOptions } from "../../shared/utils/http/fetch-options.utils";
 import { checkImageAddress } from "./user-checks.utils";
+import { useAuthId, useAuthRole, useAuthToken } from "./useUserAuthStore";
 
 export const useUserDetails = () => {
   const [userAvatarData, setUserAvatarData] = useState<string>("");
@@ -17,7 +17,9 @@ export const useUserDetails = () => {
   );
   const [error, setError] = useState<string>("");
   const { dispatch } = useUserContext();
-  const { state: userAuth } = useAuthContext();
+  const role = useAuthRole();
+  const _id = useAuthId();
+  const token = useAuthToken();
 
   const handleAvatarUpdate = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -65,16 +67,13 @@ export const useUserDetails = () => {
         avatar: userAvatarData,
       };
 
-      if (userAuth.role === "user") {
-        const response = await aoNoteFetch(
-          `/api/users/${userAuth._id}/avatar`,
-          {
-            ...putOptions<{ avatar: string }>(payload),
-            headers: {
-              Authorization: `Bearer ${userAuth.token}`,
-            },
+      if (role === "user") {
+        const response = await aoNoteFetch(`/api/users/${_id}/avatar`, {
+          ...putOptions<{ avatar: string }>(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         const result = await response.json();
 
@@ -126,11 +125,11 @@ export const useUserDetails = () => {
       displayName: userDisplayNameData,
     };
 
-    if (userAuth.role === "user") {
-      const response = await aoNoteFetch(`/api/users/${userAuth._id}/name`, {
+    if (role === "user") {
+      const response = await aoNoteFetch(`/api/users/${_id}/name`, {
         ...putOptions<{ displayName: string }>(payload),
         headers: {
-          Authorization: `Bearer ${userAuth.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
