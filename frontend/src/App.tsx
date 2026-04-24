@@ -10,7 +10,6 @@ import Profile from "./pages/[Profile]";
 
 // providers
 import NoteProvider from "./features/notes/NoteProvider";
-import AuthProvider from "./features/user/AuthProvider";
 
 // components
 import Header from "./layouts/Header";
@@ -23,22 +22,20 @@ const App = () => {
   return (
     <BrowserRouter>
       <CookiesProvider>
-        <AuthProvider>
-          <UserProvider>
-            <NoteProvider>
-              <Header />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/:id" element={<NoteDetails />} />
-                <Route path="/add-note" element={<AddNote />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/users/:id" element={<Profile />} />
-              </Routes>
-            </NoteProvider>
-            <Footer />
-          </UserProvider>
-        </AuthProvider>
+        <UserProvider>
+          <NoteProvider>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/:id" element={<NoteDetails />} />
+              <Route path="/add-note" element={<AddNote />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/users/:id" element={<Profile />} />
+            </Routes>
+          </NoteProvider>
+          <Footer />
+        </UserProvider>
       </CookiesProvider>
       <BreakpointIndicator />
     </BrowserRouter>
