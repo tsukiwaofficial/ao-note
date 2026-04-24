@@ -1,34 +1,80 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Form } from "../components/ui/Form";
 import Section from "../layouts/Section";
 import { FaUser, FaLock, FaEyeSlash, FaEye } from "react-icons/fa6";
-import { useUserSignup } from "../features/user/useUserSignup";
-import { useAuthContext } from "../features/user/useAuthContext";
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import AuthBanner from "../components/AuthBanner";
 import AoNoteError from "../components/AoNoteError";
+import { useAuthActions, useAuthRole } from "../features/user/useUserAuthStore";
+import { useNoteContext } from "../features/notes/useNoteContext";
+import { useError } from "../hooks/useError";
+import { useIsLoading } from "../hooks/useIsLoading";
+import { useErrorFields } from "../hooks/useErrorFields";
+import { timer } from "../shared/utils/timer.util";
+import type { ConfirmUser } from "../features/user/user.types";
 
 export default function Signup() {
-  const { userData, setUserData, error, errorFields, isLoading, signup } =
-    useUserSignup();
-  const { state: user } = useAuthContext();
+  const [data, setData] = useState<ConfirmUser>({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const navigate = useNavigate();
+  const { dispatch: noteDispatch } = useNoteContext();
   const [showPassword, setShowPassword] = useState<{
     pass: boolean;
     confirmPass: boolean;
   }>({ pass: false, confirmPass: false });
+  const role = useAuthRole();
+  const { useSignup } = useAuthActions();
+  const { error, setError } = useError();
+  const { isLoading, setIsLoading } = useIsLoading();
+  const { errorFields, setErrorFields } = useErrorFields();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
+    setData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await signup(userData.username, userData.password);
+    noteDispatch({ type: "GET_NOTES", payload: [] });
+    setError("");
+    setIsLoading(true);
+    setErrorFields([]);
+
+    const { response, result } = await useSignup(data);
+
+    if (!response.ok) {
+      setIsLoading(false);
+      setError(result.message);
+      if (result.error) setErrorFields([result.error]);
+
+      await timer(3);
+      setError("");
+
+      return;
+    }
+
+    if (data.password !== data.confirmPassword) {
+      setErrorFields(["password", "confirmPassword"]);
+      setError("Passwords does not match.");
+      setIsLoading(false);
+
+      await timer(3);
+      setError("");
+
+      return;
+    }
+
+    setIsLoading(false);
+    setError("");
+    setErrorFields([]);
+    navigate("/");
   };
 
   const handleShowPasswordToggle = (field: "pass" | "confirmPass") => {
@@ -38,7 +84,7 @@ export default function Signup() {
     }));
   };
 
-  if (user.role !== "user")
+  if (role !== "user")
     return (
       <Section>
         <div
@@ -65,7 +111,7 @@ export default function Signup() {
                     name="username"
                     placeholder="Username"
                     className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
-                    value={userData.username}
+                    value={data.username}
                     onChange={handleInputChange}
                     autoFocus
                   />
@@ -83,7 +129,7 @@ export default function Signup() {
                     name="password"
                     placeholder="Password"
                     className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
-                    value={userData.password}
+                    value={data.password}
                     onChange={handleInputChange}
                   />
                   <span
@@ -106,7 +152,7 @@ export default function Signup() {
                     name="confirmPassword"
                     placeholder="Confirm Password"
                     className="w-full rounded-none px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
-                    value={userData.confirmPassword}
+                    value={data.confirmPassword}
                     onChange={handleInputChange}
                   />
                   <span
