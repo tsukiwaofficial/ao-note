@@ -1,5 +1,5 @@
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
-import { jwtDecoder } from "./jwt-decoder.util";
+import { tokenDecoder } from "./token-decoder.util";
 import type { UserAuth } from "./user.types";
 
 export const refreshAccessToken = async (): Promise<UserAuth> => {
@@ -14,8 +14,8 @@ export const refreshAccessToken = async (): Promise<UserAuth> => {
     const data: UserAuth = await response.json();
 
     return {
-      _id: jwtDecoder(data.token)._id,
-      role: jwtDecoder(data.token).role,
+      _id: tokenDecoder(data.token)._id,
+      role: tokenDecoder(data.token).role,
       token: data.token,
     };
   } catch (error) {
