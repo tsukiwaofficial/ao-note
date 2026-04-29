@@ -7,7 +7,10 @@ import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa6";
 import { Button } from "../components/ui/Button";
 import AuthBanner from "../components/AuthBanner";
 import AoNoteError from "../components/AoNoteError";
-import { useAuthActions, useAuthRole } from "../features/user/useUserAuthStore";
+import {
+  useUserAuthActions,
+  useUserAuthRole,
+} from "../features/user/useUserAuthStore";
 import { useError } from "../hooks/useError";
 import { useIsLoading } from "../hooks/useIsLoading";
 import { useErrorFields } from "../hooks/useErrorFields";
@@ -17,8 +20,8 @@ import { timer } from "../shared/utils/timer.util";
 export default function Login() {
   const [data, setData] = useState<User>({ username: "", password: "" });
   const navigate = useNavigate();
-  const role = useAuthRole();
-  const { useLogin } = useAuthActions();
+  const role = useUserAuthRole();
+  const { login } = useUserAuthActions();
   const { error, setError } = useError();
   const { isLoading, setIsLoading } = useIsLoading();
   const { errorFields, setErrorFields } = useErrorFields();
@@ -38,7 +41,7 @@ export default function Login() {
     setIsLoading(true);
     setErrorFields([]);
 
-    const { response, result } = await useLogin(data);
+    const { response, result } = await login(data);
 
     if (!response.ok) {
       setIsLoading(false);

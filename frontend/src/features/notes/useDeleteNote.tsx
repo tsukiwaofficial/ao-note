@@ -1,11 +1,11 @@
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { guestNotes } from "../user/user.config";
-import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
+import { useUserAuthRole, useUserAuthToken } from "../user/useUserAuthStore";
 import type { Note, NoteAction } from "./note.types";
 
 export const useDeleteNote = () => {
-  const role = useAuthRole();
-  const token = useAuthToken();
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
 
   const deleteNote = async (
     _id: string | undefined,

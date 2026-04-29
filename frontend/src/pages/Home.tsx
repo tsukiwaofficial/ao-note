@@ -9,13 +9,16 @@ import { Link } from "react-router-dom";
 import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
 import { guestNotes } from "../features/user/user.config";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useAuthRole, useAuthToken } from "../features/user/useUserAuthStore";
+import {
+  useUserAuthRole,
+  useUserAuthToken,
+} from "../features/user/useUserAuthStore";
 
 export default function Home() {
   const { state: notes, dispatch } = useNoteContext();
   const [loading, setIsLoading] = useState<boolean>(false);
-  const role = useAuthRole();
-  const token = useAuthToken();
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
 
   useEffect(() => {
     const getNotes = async () => {
@@ -53,7 +56,7 @@ export default function Home() {
 
     if (role === "user") getNotes();
     else if (role === "guest") getLocalNotes();
-  }, [role, dispatch]);
+  }, [role, dispatch, token]);
 
   return (
     <Section>

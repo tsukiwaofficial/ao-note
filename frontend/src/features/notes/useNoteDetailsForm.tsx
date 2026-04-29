@@ -8,7 +8,7 @@ import { timer } from "../../shared/utils/timer.util";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { putOptions } from "../../shared/utils/http/fetch-options.utils";
 import { guestNotes } from "../user/user.config";
-import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
+import { useUserAuthRole, useUserAuthToken } from "../user/useUserAuthStore";
 
 export const useNoteDetailsForm = (id: string) => {
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ export const useNoteDetailsForm = (id: string) => {
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
   const { deleteNote } = useDeleteNote();
-  const role = useAuthRole();
-  const token = useAuthToken();
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
 
   const handleUpdateChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

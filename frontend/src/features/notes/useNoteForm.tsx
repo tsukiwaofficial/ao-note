@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { postOptions } from "../../shared/utils/http/fetch-options.utils";
 import { guestNotes } from "../user/user.config";
-import { useAuthRole, useAuthToken } from "../user/useUserAuthStore";
+import { useUserAuthRole, useUserAuthToken } from "../user/useUserAuthStore";
 
 export const useNoteForm = () => {
   const navigate = useNavigate();
@@ -19,8 +19,8 @@ export const useNoteForm = () => {
   });
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
-  const role = useAuthRole();
-  const token = useAuthToken();
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

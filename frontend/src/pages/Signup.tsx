@@ -6,7 +6,10 @@ import { FaUser, FaLock, FaEyeSlash, FaEye } from "react-icons/fa6";
 import { useState, type SubmitEvent } from "react";
 import AuthBanner from "../components/AuthBanner";
 import AoNoteError from "../components/AoNoteError";
-import { useAuthActions, useAuthRole } from "../features/user/useUserAuthStore";
+import {
+  useUserAuthActions,
+  useUserAuthRole,
+} from "../features/user/useUserAuthStore";
 import { useNoteContext } from "../features/notes/useNoteContext";
 import { useError } from "../hooks/useError";
 import { useIsLoading } from "../hooks/useIsLoading";
@@ -26,8 +29,8 @@ export default function Signup() {
     pass: boolean;
     confirmPass: boolean;
   }>({ pass: false, confirmPass: false });
-  const role = useAuthRole();
-  const { useSignup } = useAuthActions();
+  const role = useUserAuthRole();
+  const { signup } = useUserAuthActions();
   const { error, setError } = useError();
   const { isLoading, setIsLoading } = useIsLoading();
   const { errorFields, setErrorFields } = useErrorFields();
@@ -47,7 +50,7 @@ export default function Signup() {
     setIsLoading(true);
     setErrorFields([]);
 
-    const { response, result } = await useSignup(data);
+    const { response, result } = await signup(data);
 
     if (!response.ok) {
       setIsLoading(false);
