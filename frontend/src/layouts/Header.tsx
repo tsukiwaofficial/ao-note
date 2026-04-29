@@ -3,19 +3,54 @@ import { Button } from "../components/ui/Button";
 import { useUserLogout } from "../features/user/useUserLogout";
 import { buttonVariants } from "../shared/config/ui-variants/button-variants.config";
 import { MdLogout } from "react-icons/md";
-import { useUserContext } from "../features/user/useUserContext";
-import { defaultAvatar } from "../features/user/user.config";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useAuthId, useAuthRole } from "../features/user/useUserAuthStore";
+import {
+  useUserAuthActions,
+  useUserAuthId,
+  useUserAuthRole,
+  useUserAuthToken,
+} from "../features/user/useUserAuthStore";
+import {
+  useUserDetailsActions,
+  useUserDetailsAvatar,
+  useUserDetailsDisplayName,
+} from "../features/user/useUserDetailsStore";
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
 
 const authRoutes = ["/login", "/signup"];
 
 export default function Header() {
   const location = useLocation();
-  const { state: userDetails } = useUserContext();
+  const [cookies] = useCookies(["isLoggedIn"]);
   const { logout } = useUserLogout();
-  const _id = useAuthId();
-  const role = useAuthRole();
+  const _id = useUserAuthId();
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
+  const avatar = useUserDetailsAvatar();
+  const displayName = useUserDetailsDisplayName();
+  const { getUserDetails } = useUserDetailsActions();
+  const { initializeUserAuth, refreshUserAuth, initializeGuestAuth } =
+    useUserAuthActions();
+
+  useEffect(() => {
+    if (cookies.isLoggedIn) initializeUserAuth(cookies.isLoggedIn);
+    else initializeGuestAuth();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    refreshUserAuth(token, cookies.isLoggedIn);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  useEffect(() => {
+    getUserDetails(_id, token, cookies.isLoggedIn);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [avatar, displayName, role, cookies.isLoggedIn]);
 
   return (
     <>
@@ -25,13 +60,10 @@ export default function Header() {
           <h5>Ao Note</h5>
         </Link>
         <nav className="flex gap-10 items-center">
-          <Link
-            to={`users/${role === "user" ? _id : role}`}
-            className="flex items-center gap-2 group"
-          >
-            {Object.keys(userDetails).length > 0 || role === "guest" ? (
+          <Link to={`users/${_id}`} className="flex items-center gap-2 group">
+            {avatar || role === "guest" ? (
               <img
-                src={role === "user" ? userDetails.avatar : defaultAvatar}
+                src={avatar}
                 alt="avatar"
                 className="object-cover rounded-full max-w-10 aspect-square group-hover:scale-110 transition-transform"
               />
@@ -39,7 +71,7 @@ export default function Header() {
               <LoadingSpinner className="w-15" />
             )}
             <span className="font-semibold group-hover:text-primary transition-colors">
-              {role === "user" ? userDetails.displayName : role}
+              {displayName}
             </span>
           </Link>
           {role === "user" && (
