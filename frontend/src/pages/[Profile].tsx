@@ -5,12 +5,23 @@ import { useEffect } from "react";
 import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
 import { guestNotes } from "../features/user/user.config";
 import type { Note } from "../features/notes/note.types";
-import { useAuthRole, useAuthToken } from "../features/user/useUserAuthStore";
+import {
+  useUserAuthActions,
+  useUserAuthRole,
+  useUserAuthToken,
+} from "../features/user/useUserAuthStore";
+import { useCookies } from "react-cookie";
 
 export default function Profile() {
   const { state: notes, dispatch } = useNoteContext();
-  const role = useAuthRole();
-  const token = useAuthToken();
+  const [cookies] = useCookies(["isLoggedIn"]);
+  const role = useUserAuthRole();
+  const token = useUserAuthToken();
+  const { refreshUserAuth } = useUserAuthActions();
+
+  useEffect(() => {
+    refreshUserAuth(token, cookies.isLoggedIn);
+  }, [cookies.isLoggedIn, refreshUserAuth, token]);
 
   useEffect(() => {
     const getNotes = async () => {
