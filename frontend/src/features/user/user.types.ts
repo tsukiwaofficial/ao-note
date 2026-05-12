@@ -14,24 +14,17 @@ export interface UserAuth {
   token: string;
 }
 
-export interface UserAuthResponse extends UserAuth {
+export interface UserAuthResponse extends Response, UserAuth {
   message: string;
   error?: string;
 }
 
 interface UserAuthActions {
   actions: {
-    login: (user: User) => Promise<{
-      response: Response;
-      result: UserAuthResponse;
-    }>;
-    signup: (user: User) => Promise<{
-      response: Response;
-      result: UserAuthResponse;
-    }>;
-    initializeUserAuth: (cookie: string) => Promise<void>;
+    login: (user: User) => Promise<UserAuthResponse>;
+    signup: (user: User) => Promise<UserAuthResponse>;
+    initializeUserAuth: (cookie?: string) => Promise<void>;
     refreshUserAuth: (token: string, cookie: string) => void;
-    initializeGuestAuth: () => void;
   };
 }
 
@@ -42,23 +35,17 @@ export interface UserDetails extends MongoDbDefaults {
   displayName: string;
 }
 
-export type UserDetailsResponse = UserDetails & {
-  message: string;
-};
+export interface UserDetailsResponse extends Response, UserDetails {
+  message?: string;
+}
 
 interface UserDetailsActions {
   actions: {
     getUserDetails: (
-      id: string,
-      token: string,
       cookie: string,
-    ) => Promise<{ response: Response; user: UserDetailsResponse }>;
-    updateAvatar: (
-      imageURL: string,
-    ) => Promise<{ response: Response; result: UserDetailsResponse }>;
-    updateDisplayName: (
-      name: string,
-    ) => Promise<{ response: Response; result: UserDetailsResponse }>;
+    ) => Promise<UserDetailsResponse | UserDetails>;
+    updateAvatar: (imageURL: string) => Promise<UserDetailsResponse>;
+    updateDisplayName: (name: string) => Promise<UserDetailsResponse>;
   };
 }
 

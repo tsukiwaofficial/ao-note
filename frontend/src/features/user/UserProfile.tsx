@@ -8,14 +8,10 @@ import { Link } from "react-router-dom";
 import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
 import { formatDate } from "date-fns";
 import {
-  useUserDetailsActions,
   useUserDetailsAvatar,
   useUserDetailsCreatedAt,
   useUserDetailsDisplayName,
 } from "./useUserDetailsStore";
-import { useEffect } from "react";
-import { useCookies } from "react-cookie";
-import { useUserAuthId, useUserAuthToken } from "./useUserAuthStore";
 
 export default function UserProfile({ role }: { role: "user" | "guest" }) {
   const {
@@ -34,19 +30,9 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
     cancelAvatarUpdate,
     cancelDisplayNameUpdate,
   } = useUserDetails();
-  const [cookies] = useCookies(["isLoggedIn"]);
-  const _id = useUserAuthId();
-  const token = useUserAuthToken();
   const avatar = useUserDetailsAvatar();
   const displayName = useUserDetailsDisplayName();
   const createdAt = useUserDetailsCreatedAt();
-  const { getUserDetails } = useUserDetailsActions();
-
-  useEffect(() => {
-    getUserDetails(_id, token, cookies.isLoggedIn);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [avatar, displayName, role, cookies.isLoggedIn]);
 
   return (
     <>

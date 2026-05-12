@@ -1,10 +1,13 @@
 import { create } from "zustand";
-import type { UserDetailsStore, UserDetailsResponse } from "./user.types";
+import type {
+  UserDetailsStore,
+  UserDetailsResponse,
+  UserDetails,
+} from "./user.types";
 import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { defaultAvatar } from "./user.config";
 import { getUserAuthStore } from "./useUserAuthStore";
 import { putOptions } from "../../shared/utils/http/fetch-options.utils";
-// import { tokenDecoder } from "./token-decoder.util";
 
 const useUserDetailsStore = create<UserDetailsStore>((set) => ({
   avatar: "",
@@ -13,10 +16,12 @@ const useUserDetailsStore = create<UserDetailsStore>((set) => ({
   createdAt: "",
   updatedAt: "",
   actions: {
-    getUserDetails: async (id, token, cookie) => {
-      // const { token: decodedToken } = tokenDecoder(token);
+    getUserDetails: async (cookie) => {
+      const id = getUserAuthStore()._id;
+      const token = getUserAuthStore().token;
+      const role = getUserAuthStore().role;
 
-      if (cookie) {
+      if (cookie && role === "user") {
         const response = await aoNoteFetch(`/api/users/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -25,39 +30,32 @@ const useUserDetailsStore = create<UserDetailsStore>((set) => ({
 
         if (!response.ok) throw new Error("User details cannot be found");
 
-        const user: UserDetailsResponse = await response.json();
+        const result: UserDetailsResponse = await response.json();
 
         set(() => ({
-          ...user,
+          ...result,
         }));
 
-        return { response, user };
-      } else {
-        const guest: UserDetailsResponse = {
+        return result;
+      } else if (role === "guest") {
+        const guest: UserDetails = {
           avatar: defaultAvatar,
           displayName: "Guest User",
           _id: token,
           createdAt: new Date(Date.now()),
           updatedAt: new Date(Date.now()),
-          message: "Guest account created.",
         };
 
         set(() => ({
           ...guest,
         }));
 
-        return {
-          response: new Response(JSON.stringify(guest.message), {
-            status: 200,
-          }),
-          user: guest,
-        };
-      }
+        return guest;
+      } else return {} as UserDetails;
     },
 
     updateAvatar: async (imageURL) => {
       const _id = getUserAuthStore()._id;
-      const role = getUserAuthStore().role;
       const token = getUserAuthStore().token;
 
       const payload = {
@@ -65,32 +63,25 @@ const useUserDetailsStore = create<UserDetailsStore>((set) => ({
       };
 
       const response = await aoNoteFetch(`/api/users/${_id}/avatar`, {
-        ...putOptions<{ avatar: string }>(payload),
+        ...putOptions(payload),
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      if (!response.ok) throw new Error("Cannot update user avatar.");
+
       const result: UserDetailsResponse = await response.json();
 
-      if (role === "user") {
-        set(() => ({
-          ...payload,
-        }));
+      set(() => ({
+        ...payload,
+      }));
 
-        if (!response.ok) throw new Error("Cannot update user avatar.");
-
-        return { response, result };
-      } else
-        return {
-          response,
-          result,
-        };
+      return result;
     },
 
     updateDisplayName: async (name) => {
       const _id = getUserAuthStore()._id;
-      const role = getUserAuthStore().role;
       const token = getUserAuthStore().token;
 
       const payload = {
@@ -98,25 +89,21 @@ const useUserDetailsStore = create<UserDetailsStore>((set) => ({
       };
 
       const response = await aoNoteFetch(`/api/users/${_id}/name`, {
-        ...putOptions<{ displayName: string }>(payload),
+        ...putOptions(payload),
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      if (!response.ok) throw new Error("Cannon update the display name.");
+
       const result: UserDetailsResponse = await response.json();
 
-      if (role === "user") {
-        set(() => ({
-          ...payload,
-        }));
+      set(() => ({
+        ...payload,
+      }));
 
-        if (!response.ok) throw new Error("Cannon update the display name.");
-
-        return { response, result };
-      } else {
-        return { response, result };
-      }
+      return result;
     },
   },
 }));

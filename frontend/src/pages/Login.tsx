@@ -41,12 +41,12 @@ export default function Login() {
     setIsLoading(true);
     setErrorFields([]);
 
-    const { response, result } = await login(data);
+    const response = await login(data);
 
     if (!response.ok) {
       setIsLoading(false);
-      setError(result.message);
-      if (result.error) setErrorFields([result.error]);
+      setError(response.message);
+      if (response.error) setErrorFields([response.error]);
 
       await timer(3);
       setError("");

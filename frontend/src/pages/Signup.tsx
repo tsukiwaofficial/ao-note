@@ -10,7 +10,6 @@ import {
   useUserAuthActions,
   useUserAuthRole,
 } from "../features/user/useUserAuthStore";
-import { useNoteContext } from "../features/notes/useNoteContext";
 import { useError } from "../hooks/useError";
 import { useIsLoading } from "../hooks/useIsLoading";
 import { useErrorFields } from "../hooks/useErrorFields";
@@ -24,7 +23,6 @@ export default function Signup() {
     confirmPassword: "",
   });
   const navigate = useNavigate();
-  const { dispatch: noteDispatch } = useNoteContext();
   const [showPassword, setShowPassword] = useState<{
     pass: boolean;
     confirmPass: boolean;
@@ -45,17 +43,17 @@ export default function Signup() {
   const handleSignup = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    noteDispatch({ type: "GET_NOTES", payload: [] });
+    // noteDispatch({ type: "GET_NOTES", payload: [] });
     setError("");
     setIsLoading(true);
     setErrorFields([]);
 
-    const { response, result } = await signup(data);
+    const response = await signup(data);
 
     if (!response.ok) {
       setIsLoading(false);
-      setError(result.message);
-      if (result.error) setErrorFields([result.error]);
+      setError(response.message);
+      if (response.error) setErrorFields([response.error]);
 
       await timer(3);
       setError("");

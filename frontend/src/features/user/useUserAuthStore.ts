@@ -25,21 +25,17 @@ const useUserAuthStore = create<UserAuthStore>((set) => ({
 
       const result: UserAuthResponse = await response.json();
 
-      if (!response.ok)
-        return {
-          response,
-          result,
-        };
+      if (!response.ok) return result;
       else {
+        localStorage.removeItem(guestToken);
+
         set(() => ({
           _id: tokenDecoder(result.token)._id,
           role: tokenDecoder(result.token).role,
           token: result.token,
         }));
 
-        localStorage.removeItem(guestToken);
-
-        return { response, result };
+        return result;
       }
     },
 
@@ -55,21 +51,17 @@ const useUserAuthStore = create<UserAuthStore>((set) => ({
 
       const result: UserAuthResponse = await response.json();
 
-      if (!response.ok)
-        return {
-          response,
-          result,
-        };
+      if (!response.ok) return result;
       else {
+        localStorage.removeItem(guestToken);
+
         set(() => ({
           _id: tokenDecoder(result.token)._id,
           role: tokenDecoder(result.token).role,
           token: result.token,
         }));
 
-        localStorage.removeItem(guestToken);
-
-        return { response, result };
+        return result;
       }
     },
 
@@ -82,24 +74,17 @@ const useUserAuthStore = create<UserAuthStore>((set) => ({
             role: user.role,
             token: user.token,
           }));
-      } else
-        throw new Error(
-          "Something went wrong during authentication initialization.",
-        );
-    },
-
-    initializeGuestAuth: () => {
-      console.log("creating a new guest account");
-
-      createGuestToken();
-      const isGuestTokenExists = localStorage.getItem(guestToken);
-      if (isGuestTokenExists) {
-        const decodedGuest = tokenDecoder(isGuestTokenExists);
-        set(() => ({
-          _id: decodedGuest.token,
-          role: decodedGuest.role,
-          token: decodedGuest.token,
-        }));
+      } else {
+        createGuestToken();
+        const isGuestTokenExists = localStorage.getItem(guestToken);
+        if (isGuestTokenExists) {
+          const decodedGuest = tokenDecoder(isGuestTokenExists);
+          set(() => ({
+            _id: decodedGuest.token,
+            role: decodedGuest.role,
+            token: decodedGuest.token,
+          }));
+        }
       }
     },
 
