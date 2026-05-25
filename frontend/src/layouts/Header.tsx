@@ -5,52 +5,23 @@ import { buttonVariants } from "../shared/config/ui-variants/button-variants.con
 import { MdLogout } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
-  useUserAuthActions,
   useUserAuthId,
   useUserAuthRole,
-  useUserAuthToken,
 } from "../features/user/useUserAuthStore";
 import {
-  useUserDetailsActions,
   useUserDetailsAvatar,
   useUserDetailsDisplayName,
 } from "../features/user/useUserDetailsStore";
-import { useEffect } from "react";
-import { useCookies } from "react-cookie";
 
 const authRoutes = ["/login", "/signup"];
 
 export default function Header() {
   const location = useLocation();
-  const [cookies] = useCookies(["isLoggedIn"]);
   const { logout } = useUserLogout();
   const _id = useUserAuthId();
   const role = useUserAuthRole();
-  const token = useUserAuthToken();
   const avatar = useUserDetailsAvatar();
   const displayName = useUserDetailsDisplayName();
-  const { getUserDetails } = useUserDetailsActions();
-  const { initializeUserAuth, refreshUserAuth, initializeGuestAuth } =
-    useUserAuthActions();
-
-  useEffect(() => {
-    if (cookies.isLoggedIn) initializeUserAuth(cookies.isLoggedIn);
-    else initializeGuestAuth();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    refreshUserAuth(token, cookies.isLoggedIn);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  useEffect(() => {
-    getUserDetails(_id, token, cookies.isLoggedIn);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [avatar, displayName, role, cookies.isLoggedIn]);
 
   return (
     <>
