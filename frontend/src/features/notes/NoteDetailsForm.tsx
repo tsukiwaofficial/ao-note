@@ -97,7 +97,7 @@ export default function NoteDetailsForm({ id }: { id: string }) {
           )}
           {isUpdating && (
             <button
-              onClick={() => cancelUpdateNote(id)}
+              onClick={cancelUpdateNote}
               className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
             >
               <FaXmark />

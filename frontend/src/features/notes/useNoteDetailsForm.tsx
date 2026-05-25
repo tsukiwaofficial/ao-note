@@ -3,13 +3,12 @@ import { useEffect, useState, type SubmitEvent } from "react";
 import type { Note } from "./note.types";
 import { formChecker } from "../../shared/utils/form-checker.util";
 import { timer } from "../../shared/utils/timer.util";
-import { useNote, useNoteActions, useNotes } from "./useNoteStore";
+import { useNote, useNoteActions } from "./useNoteStore";
 import { useError } from "../../hooks/useError";
 import { useErrorFields } from "../../hooks/useErrorFields";
 
 export const useNoteDetailsForm = (id: string) => {
   const navigate = useNavigate();
-  const notes = useNotes();
   const note = useNote();
   const { getNote, updateNote } = useNoteActions();
   const [noteData, setNoteData] = useState<Note>({
@@ -63,19 +62,10 @@ export const useNoteDetailsForm = (id: string) => {
     }
   };
 
-  const cancelUpdateNote = (id: string) => {
+  const cancelUpdateNote = () => {
     setIsUpdating(false);
     setErrorFields([]);
     setError("");
-
-    const result = notes.find((item) => item._id === id);
-
-    if (!result)
-      throw new Error(
-        "Could not cancel the update. The ID might be mismatched.",
-      );
-
-    setNoteData(result);
   };
 
   useEffect(() => {
