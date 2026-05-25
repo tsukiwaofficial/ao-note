@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NoteCard from "../features/notes/NoteCard";
 import Banner from "../components/Banner";
 import Section from "../layouts/Section";
@@ -7,9 +7,10 @@ import { Link } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useUserAuthRole } from "../features/user/useUserAuthStore";
 import { useNoteActions, useNotes } from "../features/notes/useNoteStore";
+import { useIsLoading } from "../hooks/useIsLoading";
 
 export default function Home() {
-  const [loading, setIsLoading] = useState<boolean>(false);
+  const { isLoading, setIsLoading } = useIsLoading();
   const role = useUserAuthRole();
   const notes = useNotes();
   const { getNotes } = useNoteActions();
@@ -17,10 +18,10 @@ export default function Home() {
   useEffect(() => {
     setIsLoading(true);
     getNotes();
-    setIsLoading(false);
+    if (notes.length > 0) setIsLoading(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role]);
+  }, [role, notes.length]);
 
   return (
     <Section>
@@ -35,7 +36,7 @@ export default function Home() {
             Add Note
           </Link>
           <div className="h-max grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
-            {loading ? (
+            {isLoading ? (
               <LoadingSpinner className="mx-auto my-20" />
             ) : notes.length > 0 ? (
               notes.map((note) => <NoteCard key={note._id} {...note} />)

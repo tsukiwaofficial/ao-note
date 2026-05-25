@@ -40,7 +40,7 @@ const useNoteStore = create<NoteStore>((set) => ({
 
           return { response, result };
         }
-      } else {
+      } else if (role === "guest") {
         const localResult = localStorage.getItem(guestNotes);
 
         const parsedLocalNotes = localResult
@@ -57,6 +57,14 @@ const useNoteStore = create<NoteStore>((set) => ({
             { status: 200 },
           ),
           result: sortedNotes,
+        };
+      } else {
+        return {
+          response: new Response(
+            JSON.stringify({ message: "Notes are being loaded." }),
+            { status: 404 },
+          ),
+          result: [],
         };
       }
     },
