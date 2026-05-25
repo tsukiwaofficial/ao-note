@@ -1,5 +1,3 @@
-import type { UserAuth } from "./user.types";
-
 export const createGuestToken = () => {
   if (!localStorage.getItem("guestToken")) {
     const payload = {
@@ -15,11 +13,4 @@ export const createGuestToken = () => {
 
     localStorage.setItem("guestToken", result);
   }
-};
-
-export const decodeGuestToken = (token: string): UserAuth => {
-  const parts = token.split(".");
-  const role = parts[0];
-
-  return { _id: token, role: role, token: token };
 };

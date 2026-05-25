@@ -1,25 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import { useNoteContext } from "./useNoteContext";
-import { useAuthContext } from "../user/useAuthContext";
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import type { Note } from "./note.types";
 import { formChecker } from "../../shared/utils/form-checker.util";
 import { timer } from "../../shared/utils/timer.util";
-import { v4 as uuidv4 } from "uuid";
-import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
-import { postOptions } from "../../shared/utils/http/fetch-options.utils";
-import { guestNotes } from "../user/user.config";
+import { useNoteActions } from "./useNoteStore";
 
 export const useNoteForm = () => {
   const navigate = useNavigate();
-  const { dispatch } = useNoteContext();
-  const { state: user } = useAuthContext();
   const [noteData, setNoteData] = useState<Note>({
     title: "",
     content: "",
   });
   const [error, setError] = useState<string>("");
   const [emptyFields, setEmptyFields] = useState<string[]>([]);
+  const { addNote } = useNoteActions();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -28,7 +22,7 @@ export const useNoteForm = () => {
     setNoteData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e?: SubmitEvent<HTMLFormElement>) => {
     e?.preventDefault();
 
     const emptyKeys = formChecker<Note>(noteData);
@@ -53,56 +47,7 @@ export const useNoteForm = () => {
       return;
     }
 
-    const payload = {
-      title: noteData.title.trim(),
-      content: noteData.content.trim(),
-    };
-
-    const guestPayload = {
-      _id: uuidv4(),
-      ...payload,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (user.role === "user") {
-      const response = await aoNoteFetch("/api/notes", {
-        ...postOptions<Note>(payload),
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        setError(result.message);
-        if (result.emptyFields) {
-          switch (true) {
-            case result.emptyFields.includes("title"):
-              setEmptyFields(result.emptyFields);
-              break;
-            case result.emptyFields.includes("content"):
-              setEmptyFields(result.emptyFields);
-              break;
-          }
-        }
-
-        await timer(3);
-        setError("");
-
-        return;
-      }
-
-      dispatch({ type: "ADD_NOTE", payload: result });
-    } else {
-      const existingNotes = localStorage.getItem(guestNotes);
-      const parsedLocalNotes = existingNotes ? JSON.parse(existingNotes) : [];
-      parsedLocalNotes.push(guestPayload);
-      localStorage.setItem(guestNotes, JSON.stringify(parsedLocalNotes));
-
-      dispatch({ type: "ADD_NOTE", payload: guestPayload });
-    }
+    addNote(noteData);
 
     navigate("/");
     setError("");

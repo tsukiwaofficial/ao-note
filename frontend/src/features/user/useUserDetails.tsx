@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { aoNoteFetch } from "../../shared/utils/http/ao-note-fetch.util";
 import { timer } from "../../shared/utils/timer.util";
-import { useUserContext } from "./useUserContext";
-import { useAuthContext } from "./useAuthContext";
-import { putOptions } from "../../shared/utils/http/fetch-options.utils";
 import { checkImageAddress } from "./user-checks.utils";
+import { useUserAuthRole } from "./useUserAuthStore";
+import { useUserDetailsActions } from "./useUserDetailsStore";
+import { useError } from "../../hooks/useError";
 
 export const useUserDetails = () => {
   const [userAvatarData, setUserAvatarData] = useState<string>("");
@@ -15,9 +14,9 @@ export const useUserDetails = () => {
   const [emptyField, setEmptyField] = useState<"avatar" | "displayName" | "">(
     "",
   );
-  const [error, setError] = useState<string>("");
-  const { dispatch } = useUserContext();
-  const { state: userAuth } = useAuthContext();
+  const { error, setError } = useError();
+  const role = useUserAuthRole();
+  const { updateAvatar, updateDisplayName } = useUserDetailsActions();
 
   const handleAvatarUpdate = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -45,7 +44,9 @@ export const useUserDetails = () => {
     setEmptyField("");
   };
 
-  const updateAvatar = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const updateAvatarProcess = async (
+    event: React.SubmitEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (userAvatarData === "") {
@@ -61,44 +62,24 @@ export const useUserDetails = () => {
     const isImageVerified = await checkImageAddress(userAvatarData);
 
     if (isImageVerified) {
-      const payload = {
-        avatar: userAvatarData,
-      };
+      const { response, result } = await updateAvatar(userAvatarData);
 
-      if (userAuth.role === "user") {
-        const response = await aoNoteFetch(
-          `/api/users/${userAuth._id}/avatar`,
-          {
-            ...putOptions<{ avatar: string }>(payload),
-            headers: {
-              Authorization: `Bearer ${userAuth.token}`,
-            },
-          },
-        );
+      if (!response.ok) {
+        setError(result.message);
 
-        const result = await response.json();
-
-        if (!response.ok) {
-          setError(result.message);
-
-          await timer(3);
-          setError("");
-          setEmptyField("");
-          setUserAvatarData("");
-          setIsAvatarUpdating(false);
-
-          return;
-        }
-
-        setIsAvatarUpdating(false);
+        await timer(3);
         setError("");
         setEmptyField("");
         setUserAvatarData("");
-        dispatch({
-          type: "UPDATE_AVATAR",
-          payload: payload.avatar,
-        });
+        setIsAvatarUpdating(false);
+
+        return;
       }
+
+      setIsAvatarUpdating(false);
+      setError("");
+      setEmptyField("");
+      setUserAvatarData("");
     } else {
       setError("Invalid image address.");
 
@@ -107,7 +88,7 @@ export const useUserDetails = () => {
     }
   };
 
-  const updateDisplayName = async (
+  const updateDisplayNameProcess = async (
     event: React.SubmitEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
@@ -122,19 +103,8 @@ export const useUserDetails = () => {
       return;
     }
 
-    const payload = {
-      displayName: userDisplayNameData,
-    };
-
-    if (userAuth.role === "user") {
-      const response = await aoNoteFetch(`/api/users/${userAuth._id}/name`, {
-        ...putOptions<{ displayName: string }>(payload),
-        headers: {
-          Authorization: `Bearer ${userAuth.token}`,
-        },
-      });
-
-      const result = await response.json();
+    if (role === "user") {
+      const { response, result } = await updateDisplayName(userDisplayNameData);
 
       if (!response.ok) {
         setError(result.message);
@@ -152,10 +122,6 @@ export const useUserDetails = () => {
       setError("");
       setEmptyField("");
       setUserDisplayNameData("");
-      dispatch({
-        type: "UPDATE_DISPLAY_NAME",
-        payload: payload.displayName,
-      });
     }
   };
 
@@ -182,8 +148,8 @@ export const useUserDetails = () => {
     setIsDisplayNameUpdating,
     emptyField,
     error,
-    updateAvatar,
-    updateDisplayName,
+    updateAvatarProcess,
+    updateDisplayNameProcess,
     handleAvatarUpdate,
     handleDisplayNameUpdate,
     cancelAvatarUpdate,

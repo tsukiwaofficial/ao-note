@@ -1,5 +1,4 @@
 import { defaultAvatar } from "./user.config";
-import { useUserContext } from "./useUserContext";
 import { FaCheck, FaPencil, FaXmark } from "react-icons/fa6";
 import { Button } from "../../components/ui/Button";
 import { useUserDetails } from "./useUserDetails";
@@ -8,9 +7,13 @@ import AoNoteError from "../../components/AoNoteError";
 import { Link } from "react-router-dom";
 import { buttonVariants } from "../../shared/config/ui-variants/button-variants.config";
 import { formatDate } from "date-fns";
+import {
+  useUserDetailsAvatar,
+  useUserDetailsCreatedAt,
+  useUserDetailsDisplayName,
+} from "./useUserDetailsStore";
 
 export default function UserProfile({ role }: { role: "user" | "guest" }) {
-  const { state: userDetails } = useUserContext();
   const {
     userAvatarData,
     isAvatarUpdating,
@@ -20,13 +23,16 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
     setIsDisplayNameUpdating,
     emptyField,
     error,
-    updateAvatar,
-    updateDisplayName,
+    updateAvatarProcess,
+    updateDisplayNameProcess,
     handleAvatarUpdate,
     handleDisplayNameUpdate,
     cancelAvatarUpdate,
     cancelDisplayNameUpdate,
   } = useUserDetails();
+  const avatar = useUserDetailsAvatar();
+  const displayName = useUserDetailsDisplayName();
+  const createdAt = useUserDetailsCreatedAt();
 
   return (
     <>
@@ -34,7 +40,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
         className={`w-max h-max flex flex-col bg-surface px-10 py-8 rounded-xl shadow-lg ${error && !isAvatarUpdating && "animate-shake"}`}
       >
         <div className="flex items-center gap-5">
-          {Object.keys(userDetails).length > 0 || role === "guest" ? (
+          {avatar || role === "guest" ? (
             <>
               {role === "user" ? (
                 <div
@@ -42,7 +48,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
                   onClick={() => setIsAvatarUpdating(true)}
                 >
                   <img
-                    src={userDetails.avatar}
+                    src={avatar}
                     alt="avatar"
                     className="object-cover w-full h-full group-hover:brightness-50 transition-[filter]"
                   />
@@ -70,17 +76,17 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
                 {isDisplayNameUpdating ? (
                   <form
                     className="flex items-center gap-5 min-w-50"
-                    onSubmit={updateDisplayName}
+                    onSubmit={updateDisplayNameProcess}
                   >
                     <input
                       type="text"
                       name="displayName"
                       id="displayName"
-                      placeholder={userDetails.displayName}
+                      placeholder={displayName}
                       className={`text-4xl bg-transparent outline-0 rounded-none h-15 field-sizing-content font-semibold text-wrap placeholder:font-semibold ${emptyField === "displayName" ? "animate-shake placeholder:text-error/50" : ""}`}
                       value={userDisplayNameData}
                       onChange={handleDisplayNameUpdate}
-                      maxLength={25}
+                      maxLength={20}
                       autoFocus
                     />
                     <Button
@@ -101,9 +107,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
                   </form>
                 ) : (
                   <div className="flex items-center gap-5 min-w-50 h-15">
-                    <span className="text-4xl font-semibold">
-                      {role === "user" ? userDetails.displayName : role}
-                    </span>
+                    <h4 className="font-semibold">{displayName}</h4>
                     {role === "user" ? (
                       <Button
                         variant="icon"
@@ -133,9 +137,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
         {role === "user" && (
           <span className="text-sm mt-5 text-right">
             {formatDate(
-              new Date(
-                userDetails.createdAt ? userDetails.createdAt : Date.now(),
-              ),
+              new Date(createdAt ? createdAt : Date.now()),
               "LL-dd-yyyy",
             )}
           </span>
@@ -163,11 +165,15 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
       >
         <div className="space-y-2">
           <h6 className="text-center">Old</h6>
-          <img
-            src={userDetails.avatar}
-            alt="avatar"
-            className="object-cover w-80 aspect-square rounded-full "
-          />
+          {avatar ? (
+            <img
+              src={avatar}
+              alt="avatar"
+              className="object-cover w-80 aspect-square rounded-full "
+            />
+          ) : (
+            <LoadingSpinner className="w-80" />
+          )}
         </div>
         <div className="space-y-2">
           <h6 className="text-center">New</h6>
@@ -178,7 +184,7 @@ export default function UserProfile({ role }: { role: "user" | "guest" }) {
           />
         </div>
         <div className="h-full flex flex-col">
-          <form className="" onSubmit={updateAvatar}>
+          <form className="" onSubmit={updateAvatarProcess}>
             <div className="flex flex-col gap-2 mb-5">
               <label htmlFor="avatar">New Avatar Image Address</label>
               <input

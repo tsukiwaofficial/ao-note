@@ -1,40 +1,70 @@
-import { useState } from "react";
-import { useAuthContext } from "../features/user/useAuthContext";
-import { useUserLogin } from "../features/user/useUserLogin";
+import { useState, type SubmitEvent } from "react";
 import Section from "../layouts/Section";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Form } from "../components/ui/Form";
 import { FaUser } from "react-icons/fa";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa6";
 import { Button } from "../components/ui/Button";
 import AuthBanner from "../components/AuthBanner";
 import AoNoteError from "../components/AoNoteError";
+import {
+  useUserAuthActions,
+  useUserAuthRole,
+} from "../features/user/useUserAuthStore";
+import { useError } from "../hooks/useError";
+import { useIsLoading } from "../hooks/useIsLoading";
+import { useErrorFields } from "../hooks/useErrorFields";
+import type { User } from "../features/user/user.types";
+import { timer } from "../shared/utils/timer.util";
 
 export default function Login() {
-  const { userData, setUserData, error, errorFields, isLoading, login } =
-    useUserLogin();
-  const { state: user } = useAuthContext();
-
+  const [data, setData] = useState<User>({ username: "", password: "" });
+  const navigate = useNavigate();
+  const role = useUserAuthRole();
+  const { login } = useUserAuthActions();
+  const { error, setError } = useError();
+  const { isLoading, setIsLoading } = useIsLoading();
+  const { errorFields, setErrorFields } = useErrorFields();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
+    setData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleLogin = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    await login(userData.username, userData.password);
+    setError("");
+    setIsLoading(true);
+    setErrorFields([]);
+
+    const response = await login(data);
+
+    if (!response.ok) {
+      setIsLoading(false);
+      setError(response.message);
+      if (response.error) setErrorFields([response.error]);
+
+      await timer(3);
+      setError("");
+
+      return;
+    }
+
+    setIsLoading(false);
+    setError("");
+    setErrorFields([]);
+    navigate("/");
   };
 
   const handleShowPasswordToggle = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  if (user.role !== "user")
+  if (role !== "user")
     return (
       <Section>
         <div
@@ -61,7 +91,7 @@ export default function Login() {
                     name="username"
                     placeholder="Username"
                     className="w-full px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
-                    value={userData.username}
+                    value={data.username}
                     onChange={handleInputChange}
                     autoFocus
                   />
@@ -79,7 +109,7 @@ export default function Login() {
                     name="password"
                     placeholder="Password"
                     className="w-full px-10 py-4 bg-transparent outline-none autofill:bg-transparent"
-                    value={userData.password}
+                    value={data.password}
                     onChange={handleInputChange}
                   />
 
