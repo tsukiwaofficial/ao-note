@@ -1,62 +1,26 @@
 import { useEffect, useState } from "react";
-import type { Note } from "../features/notes/note.types";
 import NoteCard from "../features/notes/NoteCard";
-import { useNoteContext } from "../features/notes/useNoteContext";
 import Banner from "../components/Banner";
 import Section from "../layouts/Section";
 import { FaPlus } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
-import { guestNotes } from "../features/user/user.config";
 import LoadingSpinner from "../components/LoadingSpinner";
-import {
-  useUserAuthRole,
-  useUserAuthToken,
-} from "../features/user/useUserAuthStore";
+import { useUserAuthRole } from "../features/user/useUserAuthStore";
+import { useNoteActions, useNotes } from "../features/notes/useNoteStore";
 
 export default function Home() {
-  const { state: notes, dispatch } = useNoteContext();
   const [loading, setIsLoading] = useState<boolean>(false);
   const role = useUserAuthRole();
-  const token = useUserAuthToken();
+  const notes = useNotes();
+  const { getNotes } = useNoteActions();
 
   useEffect(() => {
-    const getNotes = async () => {
-      setIsLoading(true);
-      const response = await aoNoteFetch("/api/notes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
+    setIsLoading(true);
+    getNotes();
+    setIsLoading(false);
 
-      if (response.ok) {
-        dispatch({ type: "GET_NOTES", payload: result });
-      }
-      setIsLoading(false);
-    };
-
-    const getLocalNotes = async () => {
-      setIsLoading(true);
-      const localResult = localStorage.getItem(guestNotes);
-
-      const parsedLocalNotes = localResult
-        ? (JSON.parse(localResult) as Note[])
-        : [];
-
-      const sortedNotes = parsedLocalNotes.sort((noteA, noteB) => {
-        const dateA = new Date(noteA.updatedAt as string).getTime();
-        const dateB = new Date(noteB.updatedAt as string).getTime();
-        return dateB - dateA;
-      });
-
-      dispatch({ type: "GET_NOTES", payload: sortedNotes });
-      setIsLoading(false);
-    };
-
-    if (role === "user") getNotes();
-    else if (role === "guest") getLocalNotes();
-  }, [role, dispatch, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role]);
 
   return (
     <Section>
@@ -74,18 +38,7 @@ export default function Home() {
             {loading ? (
               <LoadingSpinner className="mx-auto my-20" />
             ) : notes.length > 0 ? (
-              notes.map(
-                ({ _id, title, content, createdAt, updatedAt }: Note) => (
-                  <NoteCard
-                    key={_id}
-                    _id={_id}
-                    title={title}
-                    content={content}
-                    createdAt={createdAt}
-                    updatedAt={updatedAt}
-                  />
-                ),
-              )
+              notes.map((note) => <NoteCard key={note._id} {...note} />)
             ) : (
               <div className="text-slate-500 mx-auto my-20">No notes found</div>
             )}

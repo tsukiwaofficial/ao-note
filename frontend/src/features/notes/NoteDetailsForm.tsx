@@ -5,62 +5,71 @@ import BackBtn from "../../components/buttons/BackBtn";
 import { Form } from "../../components/ui/Form";
 import AoNoteError from "../../components/AoNoteError";
 import { useNoteDetailsForm } from "./useNoteDetailsForm";
+import { useNote, useNoteActions } from "./useNoteStore";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { Button } from "../../components/ui/Button";
 
 export default function NoteDetailsForm({ id }: { id: string }) {
   const {
     noteData,
-    dispatch,
     navigate,
     error,
-    emptyFields,
-    updateNote,
+    errorFields,
+    updateNoteProcess,
     isUpdating,
     setIsUpdating,
     handleUpdateChange,
-    deleteNote,
     cancelUpdateNote,
   } = useNoteDetailsForm(id);
+  const { deleteNote } = useNoteActions();
+  const note = useNote();
 
   return (
-    <Form className={error && "animate-shake"} onSubmit={updateNote}>
+    <Form className={error && "animate-shake"} onSubmit={updateNoteProcess}>
       <div className="w-full max-w-[90%] h-max">
         <div
           onClick={() => setIsUpdating(true)}
           className="w-full flex flex-col cursor-text"
         >
-          {isUpdating ? (
-            <textarea
-              name="title"
-              id="update-title"
-              className={`${emptyFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
-              placeholder="Title"
-              value={noteData.title}
-              onChange={handleUpdateChange}
-              onKeyDown={(event) => handleKeyDown(event, updateNote)}
-            />
+          {note._id === id ? (
+            <>
+              {isUpdating ? (
+                <textarea
+                  name="title"
+                  id="update-title"
+                  className={`${errorFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
+                  placeholder="Title"
+                  value={noteData.title}
+                  onChange={handleUpdateChange}
+                  onKeyDown={(event) => handleKeyDown(event, updateNoteProcess)}
+                />
+              ) : (
+                <h5 className="whitespace-normal pl-2 text-primary">
+                  {note.title}
+                </h5>
+              )}
+              <NoteDate
+                className="mt-1 mb-10 ml-2"
+                createdAt={note.createdAt}
+                updatedAt={note.updatedAt}
+              />
+              <div className=""></div>
+              {isUpdating ? (
+                <textarea
+                  name="content"
+                  id="update-content"
+                  className={`${errorFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
+                  placeholder="Content"
+                  value={noteData.content}
+                  onChange={handleUpdateChange}
+                  onKeyDown={(event) => handleKeyDown(event, updateNoteProcess)}
+                />
+              ) : (
+                <div className="whitespace-pre-line pl-2">{note.content}</div>
+              )}
+            </>
           ) : (
-            <h5 className="whitespace-normal pl-2 text-primary">
-              {noteData.title}
-            </h5>
-          )}
-          <NoteDate
-            className="mt-1 mb-10 ml-2"
-            createdAt={noteData.createdAt}
-            updatedAt={noteData.updatedAt}
-          />
-          <div className=""></div>
-          {isUpdating ? (
-            <textarea
-              name="content"
-              id="update-content"
-              className={`${emptyFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
-              placeholder="Content"
-              value={noteData.content}
-              onChange={handleUpdateChange}
-              onKeyDown={(event) => handleKeyDown(event, updateNote)}
-            />
-          ) : (
-            <div className="whitespace-pre-line pl-2">{noteData.content}</div>
+            <LoadingSpinner />
           )}
         </div>
         <AoNoteError error={error} className="w-max" />
@@ -70,19 +79,22 @@ export default function NoteDetailsForm({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => {
-              deleteNote(noteData._id, dispatch);
+              deleteNote(note._id);
               navigate("/");
             }}
             className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
           >
             <FaTrash />
           </button>
-          <button
-            type="submit"
-            className="rounded-full p-4 hover:bg-primary cursor-pointer hover:text-white transition-colors"
-          >
-            {isUpdating ? <FaCheck /> : <FaPencil />}
-          </button>
+          {isUpdating ? (
+            <Button type="submit" variant="icon" className="hover:bg-primary">
+              <FaCheck />
+            </Button>
+          ) : (
+            <Button type="button" variant="icon" className="hover:bg-primary">
+              <FaPencil />
+            </Button>
+          )}
           {isUpdating && (
             <button
               onClick={() => cancelUpdateNote(id)}

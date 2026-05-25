@@ -1,61 +1,23 @@
 import UserProfile from "../features/user/UserProfile";
 import Section from "../layouts/Section";
-import { useNoteContext } from "../features/notes/useNoteContext";
 import { useEffect } from "react";
-import { aoNoteFetch } from "../shared/utils/http/ao-note-fetch.util";
-import { guestNotes } from "../features/user/user.config";
-import type { Note } from "../features/notes/note.types";
 import {
-  useUserAuthActions,
   useUserAuthRole,
   useUserAuthToken,
 } from "../features/user/useUserAuthStore";
-import { useCookies } from "react-cookie";
+import { useNoteActions, useNotes } from "../features/notes/useNoteStore";
 
 export default function Profile() {
-  const { state: notes, dispatch } = useNoteContext();
-  const [cookies] = useCookies(["isLoggedIn"]);
   const role = useUserAuthRole();
   const token = useUserAuthToken();
-  const { refreshUserAuth } = useUserAuthActions();
+  const notes = useNotes();
+  const { getNotes } = useNoteActions();
 
   useEffect(() => {
-    refreshUserAuth(token, cookies.isLoggedIn);
-  }, [cookies.isLoggedIn, refreshUserAuth, token]);
+    getNotes();
 
-  useEffect(() => {
-    const getNotes = async () => {
-      const response = await aoNoteFetch("/api/notes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        dispatch({ type: "GET_NOTES", payload: result });
-      }
-    };
-
-    const getLocalNotes = async () => {
-      const localResult = localStorage.getItem(guestNotes);
-
-      const parsedLocalNotes = localResult
-        ? (JSON.parse(localResult) as Note[])
-        : [];
-
-      const sortedNotes = parsedLocalNotes.sort((noteA, noteB) => {
-        const dateA = new Date(noteA.updatedAt as string).getTime();
-        const dateB = new Date(noteB.updatedAt as string).getTime();
-        return dateB - dateA;
-      });
-
-      dispatch({ type: "GET_NOTES", payload: sortedNotes });
-    };
-
-    if (role === "user") getNotes();
-    else if (role === "guest") getLocalNotes();
-  }, [role, token, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, token]);
 
   return (
     <Section className="flex gap-10">
