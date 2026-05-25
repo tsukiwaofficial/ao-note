@@ -6,9 +6,11 @@ import { timer } from "../../shared/utils/timer.util";
 import { useNote, useNoteActions } from "./useNoteStore";
 import { useError } from "../../hooks/useError";
 import { useErrorFields } from "../../hooks/useErrorFields";
+import { useUserAuthRole } from "../user/useUserAuthStore";
 
 export const useNoteDetailsForm = (id: string) => {
   const navigate = useNavigate();
+  const role = useUserAuthRole();
   const note = useNote();
   const { getNote, updateNote } = useNoteActions();
   const [noteData, setNoteData] = useState<Note>({
@@ -73,7 +75,7 @@ export const useNoteDetailsForm = (id: string) => {
     setNoteData(note);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, note._id]);
+  }, [role, id, note._id]);
 
   return {
     noteData,
