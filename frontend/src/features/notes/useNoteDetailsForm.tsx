@@ -68,6 +68,7 @@ export const useNoteDetailsForm = (id: string) => {
     setIsUpdating(false);
     setErrorFields([]);
     setError("");
+    setNoteData(note);
   };
 
   useEffect(() => {
