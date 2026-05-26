@@ -15,13 +15,13 @@ export default function NoteForm() {
     useNoteForm();
 
   return (
-    <Form className={error && "animate-shake"} onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit}>
       <div className="w-full max-w-[90%] h-max">
         <div className="flex flex-col gap-11 cursor-text">
           <textarea
             name="title"
             id="title"
-            className={`${emptyFields.includes("title") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
+            className={`${emptyFields.includes("title") && error && "placeholder:text-error/50 focus:outline-none animate-shake"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
             placeholder={`Type here the title of your note. For example, ${titlePlaceholder}`}
             value={noteData.title}
             onChange={handleInputChange}
@@ -31,7 +31,7 @@ export default function NoteForm() {
           <textarea
             name="content"
             id="content"
-            className={`${emptyFields.includes("content") ? "placeholder:text-error/50 focus:outline-none" : ""} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15`}
+            className={`${emptyFields.includes("content") && error && "placeholder:text-error/50 focus:outline-none animate-shake"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15`}
             placeholder={contentPlaceholder}
             value={noteData.content}
             onChange={handleInputChange}
