@@ -25,7 +25,7 @@ export default function NoteDetailsForm({ id }: { id: string }) {
   const note = useNote();
 
   return (
-    <Form className={error && "animate-shake"} onSubmit={updateNoteProcess}>
+    <Form onSubmit={updateNoteProcess}>
       <div className="w-full max-w-[90%] h-max">
         <div
           onClick={() => setIsUpdating(true)}
@@ -37,11 +37,12 @@ export default function NoteDetailsForm({ id }: { id: string }) {
                 <textarea
                   name="title"
                   id="update-title"
-                  className={`${errorFields.includes("title") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
+                  className={`${errorFields.includes("title") && error && "placeholder:text-error/50 focus:outline-none animate-shake"} rounded-none border-none focus:outline-none pl-2 bg-transparent text-3xl font-bold text-primary transition-colors`}
                   placeholder="Title"
                   value={noteData.title}
                   onChange={handleUpdateChange}
                   onKeyDown={(event) => handleKeyDown(event, updateNoteProcess)}
+                  autoFocus
                 />
               ) : (
                 <h5 className="whitespace-normal pl-2 text-primary">
@@ -58,7 +59,7 @@ export default function NoteDetailsForm({ id }: { id: string }) {
                 <textarea
                   name="content"
                   id="update-content"
-                  className={`${errorFields.includes("content") && "placeholder:text-error/50 focus:outline-none"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
+                  className={`${errorFields.includes("content") && error && "placeholder:text-error/50 focus:outline-none animate-shake"} rounded-none border-none focus:outline-none pl-2 bg-transparent min-h-15 transition-colors`}
                   placeholder="Content"
                   value={noteData.content}
                   onChange={handleUpdateChange}
@@ -76,33 +77,40 @@ export default function NoteDetailsForm({ id }: { id: string }) {
       </div>
       <div className="flex flex-col-reverse items-center justify-between gap-5">
         <div className="flex xl:flex-col">
-          <button
+          <Button
             type="button"
+            variant="icon"
             onClick={() => {
               deleteNote(note._id);
               navigate("/");
             }}
-            className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
+            className="hover:bg-error"
           >
             <FaTrash />
-          </button>
-          {isUpdating ? (
-            <Button type="submit" variant="icon" className="hover:bg-primary">
-              <FaCheck />
-            </Button>
-          ) : (
-            <Button type="button" variant="icon" className="hover:bg-primary">
-              <FaPencil />
-            </Button>
-          )}
-          {isUpdating && (
-            <button
-              onClick={cancelUpdateNote}
-              className="rounded-full p-4 hover:bg-error cursor-pointer hover:text-white transition-colors"
-            >
-              <FaXmark />
-            </button>
-          )}
+          </Button>
+          <Button
+            type="submit"
+            variant="icon"
+            className={`hover:bg-primary ${!isUpdating ? "hidden" : "block"}`}
+          >
+            <FaCheck />
+          </Button>
+          <Button
+            type="button"
+            variant="icon"
+            onClick={() => setIsUpdating(true)}
+            className={`hover:bg-primary ${isUpdating ? "hidden" : "block"}`}
+          >
+            <FaPencil />
+          </Button>
+          <Button
+            type="button"
+            variant="icon"
+            onClick={cancelUpdateNote}
+            className={`hover:bg-error ${!isUpdating ? "hidden" : "block"}`}
+          >
+            <FaXmark />
+          </Button>
         </div>
         <BackBtn />
       </div>
